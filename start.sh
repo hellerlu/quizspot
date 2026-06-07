@@ -94,34 +94,50 @@ HOST_URL="http://$IP:$PORT/host.html"
 TV_URL="http://$IP:$PORT/tv.html"
 PLAYER_URL="http://$IP:$PORT/"
 
-# --- Step 3: Display endpoints ---
-echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-echo -e "  ${BOLD}📡 Server will be available at:${RESET}"
 echo ""
-echo -e "  ${MAGENTA}🎮 Host   →${RESET}  ${BOLD}$HOST_URL${RESET}"
-echo -e "  ${CYAN}📺 TV     →${RESET}  ${BOLD}$TV_URL${RESET}"
-echo -e "  ${GREEN}👥 Player →${RESET}  ${BOLD}$PLAYER_URL${RESET}"
-echo ""
-echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+echo -e "${YELLOW}▶  Starting QuizSpot server...${RESET}"
 echo ""
 
-# --- Step 4: Copy Host URL to clipboard ---
-if command -v termux-clipboard-set &> /dev/null; then
-    echo "$HOST_URL" | termux-clipboard-set
-    echo -e "${GREEN}📋 Host URL copied to clipboard!${RESET}"
-    echo -e "${DIM}   $HOST_URL${RESET}"
-else
-    echo -e "${YELLOW}⚠  termux-clipboard-set not found. Install termux-api: pkg install termux-api${RESET}"
-    echo -e "${DIM}   Host URL: $HOST_URL${RESET}"
-fi
-
-echo ""
-echo -e "${YELLOW}▶  Starting QuizSpot server... ${DIM}(Ctrl+C to stop)${RESET}"
-echo ""
-
-# --- Step 5: Start the server (in background so trap can catch Ctrl+C) ---
+# --- Step 5: Start the server, capturing output ---
 node server.js &
 SERVER_PID=$!
+
+# Poll until port is open (max 8 seconds)
+READY=0
+for i in 1 2 3 4 5 6 7 8; do
+    sleep 1
+    # Use Node to check if our port is accepting connections
+    node -e "
+const net = require('net');
+const c = net.connect($PORT, '127.0.0.1', () => { c.destroy(); process.exit(0); });
+c.on('error', () => process.exit(1));
+" 2>/dev/null && READY=1 && break
+done
+
+if [ "$READY" -eq 1 ]; then
+    # Copy Host URL to clipboard now that we know server is live
+    if command -v termux-clipboard-set &>/dev/null; then
+        echo "$HOST_URL" | termux-clipboard-set
+    fi
+
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+    echo -e "${GREEN}${BOLD}  ✔ Server is live! Open a link below to start:${RESET}"
+    echo ""
+    echo -e "  ${MAGENTA}🎮 Host   →${RESET}  ${BOLD}$HOST_URL${RESET}"
+    echo -e "  ${CYAN}📺 TV     →${RESET}  ${BOLD}$TV_URL${RESET}"
+    echo -e "  ${GREEN}👥 Player →${RESET}  ${BOLD}$PLAYER_URL${RESET}"
+    echo ""
+    if command -v termux-clipboard-set &>/dev/null; then
+        echo -e "  ${DIM}📋 Host URL copied to clipboard${RESET}"
+        echo ""
+    fi
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+    echo -e "${DIM}  Press Ctrl+C to stop the server${RESET}"
+    echo ""
+else
+    echo -e "${RED}${BOLD}  ✘ Server failed to start! Check errors above.${RESET}"
+    echo ""
+fi
 
 # Wait for the server process — the trap will fire on Ctrl+C
 wait $SERVER_PID
