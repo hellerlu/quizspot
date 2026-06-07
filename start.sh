@@ -64,27 +64,27 @@ fi
 
 echo ""
 
-# --- Step 2: Get local IP (supports both hotspot host and Wi-Fi client mode) ---
+# --- Step 2: Get local IP via Node.js (bypasses Android netlink restrictions) ---
+IP=$(node -e "
+const os = require('os');
+const nets = os.networkInterfaces();
+let found = '';
+for (const name of Object.keys(nets)) {
+  for (const net of nets[name]) {
+    if (net.family === 'IPv4' && !net.internal) {
+      // Prefer hotspot range
+      if (!found || net.address.startsWith('192.168.43.')) {
+        found = net.address;
+      }
+    }
+  }
+}
+console.log(found);
+" 2>/dev/null)
 
-# Grab all non-loopback, non-link-local IPv4 addresses across all interfaces
-ALL_IPS=$(ip addr show 2>/dev/null \
-    | awk '/inet / {print $2}' \
-    | cut -d/ -f1 \
-    | grep -v '^127\.' \
-    | grep -v '^169\.254\.')
-
-# Prefer the Android hotspot gateway range (192.168.43.x or 192.168.0.x)
-IP=$(echo "$ALL_IPS" | grep -E '^192\.168\.(43|0|1|2|4|8)\.' | head -1)
-
-# Fallback: any remaining address
-if [ -z "$IP" ]; then
-    IP=$(echo "$ALL_IPS" | head -1)
-fi
-
-# Final fallback: ask the user
+# Fallback: prompt the user
 if [ -z "$IP" ]; then
     echo -e "${YELLOW}⚠  Could not detect IP automatically.${RESET}"
-    echo -e "${DIM}   Run 'ip addr show' to find it, or check your hotspot settings.${RESET}"
     echo -e "${DIM}   Android hotspot IP is usually: 192.168.43.1${RESET}"
     echo -ne "${BOLD}   Enter your IP manually: ${RESET}"
     read -r IP
