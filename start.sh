@@ -94,6 +94,18 @@ HOST_URL="http://$IP:$PORT/host.html"
 TV_URL="http://$IP:$PORT/tv.html"
 PLAYER_URL="http://$IP:$PORT/"
 
+# --- Step 3: Install dependencies if missing ---
+if [ ! -d "node_modules" ] || [ ! -d "node_modules/express" ]; then
+    echo -e "${YELLOW}📦 Installing dependencies (first run or missing modules)...${RESET}"
+    npm install
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}${BOLD}  ✘ npm install failed. Check your connection and try again.${RESET}"
+        exit 1
+    fi
+    echo -e "${GREEN}✔ Dependencies installed.${RESET}"
+    echo ""
+fi
+
 echo ""
 echo -e "${YELLOW}▶  Starting QuizSpot server...${RESET}"
 echo ""
