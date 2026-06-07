@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Join Game | QUIZMASTER</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.4);
+        }
+        .neon-glow-blue {
+            box-shadow: 0 0 25px rgba(74, 142, 255, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001a41",
+                    "outline-variant": "#414754",
+                    "on-secondary": "#053900",
+                    "on-primary-container": "#00285b",
+                    "tertiary-fixed": "#e1e2eb",
+                    "surface-container-low": "#181c23",
+                    "primary-container": "#4a8eff",
+                    "primary-fixed": "#d8e2ff",
+                    "secondary-fixed": "#79ff5b",
+                    "on-tertiary-fixed": "#191c22",
+                    "inverse-on-surface": "#2d3039",
+                    "on-secondary-fixed-variant": "#095300",
+                    "background": "#10131b",
+                    "primary-fixed-dim": "#adc7ff",
+                    "primary": "#adc7ff",
+                    "tertiary-fixed-dim": "#c4c6cf",
+                    "surface": "#10131b",
+                    "surface-container-highest": "#31353d",
+                    "on-primary": "#002e68",
+                    "on-secondary-fixed": "#022100",
+                    "surface-bright": "#363942",
+                    "inverse-primary": "#005bc0",
+                    "on-primary-fixed-variant": "#004493",
+                    "outline": "#8b90a0",
+                    "error-container": "#93000a",
+                    "secondary-container": "#2ff801",
+                    "surface-container": "#1c2027",
+                    "tertiary-container": "#8e9099",
+                    "surface-container-high": "#272a32",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#0b0e16",
+                    "on-tertiary-fixed-variant": "#44474e",
+                    "on-surface-variant": "#c1c6d7",
+                    "surface-dim": "#10131b",
+                    "tertiary": "#c4c6cf",
+                    "inverse-surface": "#e0e2ed",
+                    "secondary": "#d7ffc5",
+                    "on-background": "#e0e2ed",
+                    "on-secondary-container": "#0f6d00",
+                    "surface-variant": "#31353d",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#e0e2ed",
+                    "on-tertiary-container": "#272a30",
+                    "secondary-fixed-dim": "#2ae500",
+                    "on-tertiary": "#2e3037",
+                    "surface-tint": "#adc7ff",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "gutter-mobile": "16px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "safe-area-tv": "5%",
+                    "md": "24px",
+                    "xs": "4px",
+                    "lg": "48px"
+            },
+            "fontFamily": {
+                    "display-tv": ["Sora"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-md": ["Sora"],
+                    "headline-lg-mobile": ["Sora"],
+                    "headline-sm": ["Sora"],
+                    "label-bold": ["Sora"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display-mobile": ["Sora"],
+                    "headline-lg": ["Sora"]
+            },
+            "fontSize": {
+                    "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                    "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                    "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                    "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center overflow-hidden selection:bg-primary-container selection:text-white">
+<!-- Subtle Background Atmosphere -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-primary-container/10 blur-[150px] rounded-full"></div>
+</div>
+<!-- Main Content Canvas -->
+<main class="relative z-10 flex flex-col items-center justify-center w-full max-w-[480px] min-h-screen px-gutter-mobile py-6">
+<!-- Animated Logo Section -->
+<div class="flex flex-col items-center mb-md">
+<div class="relative w-24 h-24 mb-sm">
+<div class="absolute inset-0 bg-primary/20 rounded-2xl rotate-45 animate-pulse-glow"></div>
+<div class="absolute inset-2 glass-panel rounded-xl flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">
+                        grid_view
+                    </span>
+</div>
+</div>
+<h1 class="font-display-mobile text-display-mobile text-primary tracking-tighter italic">
+                QuizSpot
+            </h1>
+<p class="font-body-md text-body-md text-outline-variant mt-xs">Ready for the challenge?</p>
+</div>
+<!-- Join Form Section -->
+<div class="w-full space-y-md">
+<!-- Nickname Input -->
+<div class="relative group">
+<label class="absolute -top-3 left-4 px-2 bg-background font-label-bold text-label-bold text-primary z-20 transition-all group-focus-within:text-secondary-fixed" for="nickname">
+                    NICKNAME
+                </label>
+<div class="relative overflow-hidden rounded-xl">
+<input autofocus="" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-6 py-8 font-headline-sm text-headline-sm-mobile text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary-container transition-all text-center focus:ring-4 focus:ring-primary/10" id="nickname" maxlength="12" placeholder="Type your alias..." type="text"/>
+<div class="absolute bottom-0 left-0 h-1 bg-primary-container w-0 transition-all duration-500 group-focus-within:w-full"></div>
+</div>
+<p class="mt-sm text-center font-body-md text-body-md text-outline-variant">Max 12 characters</p>
+</div>
+<!-- CTA Button -->
+<div class="w-full space-y-sm mb-md">
+<p class="font-label-bold text-label-bold text-primary text-center uppercase tracking-wider">Choose your character</p>
+<div class="flex gap-md overflow-x-auto pb-2 px-2 no-scrollbar snap-x">
+<div class="flex-none snap-center">
+<div class="w-24 h-24 rounded-full border-4 border-primary-container neon-glow-blue overflow-hidden transition-all">
+<img alt="Avatar 1" class="w-full h-full object-cover scale-[3.5] translate-x-[-33%] translate-y-[-33%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7GVDRMhKlcjx8bcgRsApT77voGdlzUygBjZDZWVsz0v2anhN9lsYjmCuFbSS8nowmKlgVI5PchmdLn8Hc8r98vY7MSQxYhMN7JTaAEfej8R8B5wEQMz4wVcGzmXeNAdlCf-8EBCLYUfIGQgA9yuRSGWMRbtJWZ26s1mQa21Tv3uzY9bEKHF-Jb4y3wTK-QJpzInT8QLGmFKA5301IH5F1SMj9nY92h19Soqo8d6VnGM2-cBww6qs7kIhihv8gaq-d6GV-EcTjg75"/>
+</div>
+</div>
+<div class="flex-none snap-center">
+<div class="w-24 h-24 rounded-full border-2 border-outline-variant overflow-hidden opacity-60 hover:opacity-100 transition-all">
+<img alt="Avatar 2" class="w-full h-full object-cover scale-[3.5] translate-x-[-11%] translate-y-[-33%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7GVDRMhKlcjx8bcgRsApT77voGdlzUygBjZDZWVsz0v2anhN9lsYjmCuFbSS8nowmKlgVI5PchmdLn8Hc8r98vY7MSQxYhMN7JTaAEfej8R8B5wEQMz4wVcGzmXeNAdlCf-8EBCLYUfIGQgA9yuRSGWMRbtJWZ26s1mQa21Tv3uzY9bEKHF-Jb4y3wTK-QJpzInT8QLGmFKA5301IH5F1SMj9nY92h19Soqo8d6VnGM2-cBww6qs7kIhihv8gaq-d6GV-EcTjg75"/>
+</div>
+</div>
+<div class="flex-none snap-center">
+<div class="w-24 h-24 rounded-full border-2 border-outline-variant overflow-hidden opacity-60 hover:opacity-100 transition-all">
+<img alt="Avatar 3" class="w-full h-full object-cover scale-[3.5] translate-x-[11%] translate-y-[-33%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7GVDRMhKlcjx8bcgRsApT77voGdlzUygBjZDZWVsz0v2anhN9lsYjmCuFbSS8nowmKlgVI5PchmdLn8Hc8r98vY7MSQxYhMN7JTaAEfej8R8B5wEQMz4wVcGzmXeNAdlCf-8EBCLYUfIGQgA9yuRSGWMRbtJWZ26s1mQa21Tv3uzY9bEKHF-Jb4y3wTK-QJpzInT8QLGmFKA5301IH5F1SMj9nY92h19Soqo8d6VnGM2-cBww6qs7kIhihv8gaq-d6GV-EcTjg75"/>
+</div>
+</div>
+<div class="flex-none snap-center">
+<div class="w-24 h-24 rounded-full border-2 border-outline-variant overflow-hidden opacity-60 hover:opacity-100 transition-all">
+<img alt="Avatar 4" class="w-full h-full object-cover scale-[3.5] translate-x-[33%] translate-y-[-33%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7GVDRMhKlcjx8bcgRsApT77voGdlzUygBjZDZWVsz0v2anhN9lsYjmCuFbSS8nowmKlgVI5PchmdLn8Hc8r98vY7MSQxYhMN7JTaAEfej8R8B5wEQMz4wVcGzmXeNAdlCf-8EBCLYUfIGQgA9yuRSGWMRbtJWZ26s1mQa21Tv3uzY9bEKHF-Jb4y3wTK-QJpzInT8QLGmFKA5301IH5F1SMj9nY92h19Soqo8d6VnGM2-cBww6qs7kIhihv8gaq-d6GV-EcTjg75"/>
+</div>
+</div>
+<div class="flex-none snap-center">
+<div class="w-24 h-24 rounded-full border-2 border-outline-variant overflow-hidden opacity-60 hover:opacity-100 transition-all">
+<img alt="Avatar 5" class="w-full h-full object-cover scale-[3.5] translate-x-[-33%] translate-y-[-11%]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL7GVDRMhKlcjx8bcgRsApT77voGdlzUygBjZDZWVsz0v2anhN9lsYjmCuFbSS8nowmKlgVI5PchmdLn8Hc8r98vY7MSQxYhMN7JTaAEfej8R8B5wEQMz4wVcGzmXeNAdlCf-8EBCLYUfIGQgA9yuRSGWMRbtJWZ26s1mQa21Tv3uzY9bEKHF-Jb4y3wTK-QJpzInT8QLGmFKA5301IH5F1SMj9nY92h19Soqo8d6VnGM2-cBww6qs7kIhihv8gaq-d6GV-EcTjg75"/>
+</div>
+</div>
+</div>
+</div><button class="w-full bg-primary-container text-on-primary-container font-headline-sm text-headline-sm-mobile py-6 rounded-xl neon-glow-blue hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center justify-center gap-md group" id="join-button">
+<span class="">JOIN GAME</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-variation-settings: 'wght' 700;">
+                    arrow_forward
+                </span>
+</button>
+</div>
+<!-- Secondary Actions / Info -->
+<div class="mt-lg flex flex-col items-center gap-md">
+<div class="flex items-center gap-sm font-label-bold text-label-bold text-outline-variant">
+<span class="material-symbols-outlined text-sm">wifi</span>
+<span class="">GAME PIN: 882 991</span>
+</div>
+<div class="flex gap-gutter-mobile">
+<button class="flex items-center gap-xs font-label-bold text-label-bold text-outline hover:text-primary transition-colors py-2 px-4 rounded-full glass-panel active:opacity-80">
+<span class="material-symbols-outlined text-md">help</span>
+<span class="">HOW TO PLAY</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Visual Polish: Static Noise Overlay -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] z-[100] mix-blend-overlay">
+<div class="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+</div>
+<!-- Interaction Script -->
+<script>
+        const nicknameInput = document.getElementById('nickname');
+        const joinButton = document.getElementById('join-button');
+
+        // Simple button activation feedback
+        nicknameInput.addEventListener('input', (e) => {
+            if (e.target.value.trim().length >= 3) {
+                joinButton.classList.remove('opacity-50', 'grayscale');
+                joinButton.classList.add('neon-glow-blue');
+            } else {
+                joinButton.classList.add('opacity-50', 'grayscale');
+                joinButton.classList.remove('neon-glow-blue');
+            }
+        });
+
+        // Trigger pulse on join attempt
+        joinButton.addEventListener('click', () => {
+            const val = nicknameInput.value.trim();
+            if (val) {
+                joinButton.innerHTML = `
+                    <span class="material-symbols-outlined animate-spin">progress_activity</span>
+                    <span>JOINING...</span>
+                `;
+                joinButton.disabled = true;
+                setTimeout(() => {
+                    // Simulating transition
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.5s ease-out';
+                }, 800);
+            } else {
+                nicknameInput.classList.add('border-error');
+                setTimeout(() => nicknameInput.classList.remove('border-error'), 500);
+            }
+        });
+    </script>
+</body></html>

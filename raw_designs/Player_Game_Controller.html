@@ -1,0 +1,228 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+        }
+        .neon-glow-red { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.4)); }
+        .neon-glow-blue { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4)); }
+        .neon-glow-yellow { filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.4)); }
+        .neon-glow-green { filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.4)); }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "on-primary-fixed": "#001a41",
+                "outline-variant": "#414754",
+                "on-secondary": "#053900",
+                "on-primary-container": "#00285b",
+                "tertiary-fixed": "#e1e2eb",
+                "surface-container-low": "#181c23",
+                "primary-container": "#4a8eff",
+                "primary-fixed": "#d8e2ff",
+                "secondary-fixed": "#79ff5b",
+                "on-tertiary-fixed": "#191c22",
+                "inverse-on-surface": "#2d3039",
+                "on-secondary-fixed-variant": "#095300",
+                "background": "#10131b",
+                "primary-fixed-dim": "#adc7ff",
+                "primary": "#adc7ff",
+                "tertiary-fixed-dim": "#c4c6cf",
+                "surface": "#10131b",
+                "surface-container-highest": "#31353d",
+                "on-primary": "#002e68",
+                "on-secondary-fixed": "#022100",
+                "surface-bright": "#363942",
+                "inverse-primary": "#005bc0",
+                "on-primary-fixed-variant": "#004493",
+                "outline": "#8b90a0",
+                "error-container": "#93000a",
+                "secondary-container": "#2ff801",
+                "surface-container": "#1c2027",
+                "tertiary-container": "#8e9099",
+                "surface-container-high": "#272a32",
+                "on-error": "#690005",
+                "surface-container-highest": "#31353d",
+                "on-surface-variant": "#c1c6d7",
+                "surface-dim": "#10131b",
+                "tertiary": "#c4c6cf",
+                "inverse-surface": "#e0e2ed",
+                "secondary": "#d7ffc5",
+                "on-background": "#e0e2ed",
+                "on-secondary-container": "#0f6d00",
+                "surface-variant": "#31353d",
+                "on-error-container": "#ffdad6",
+                "on-surface": "#e0e2ed",
+                "on-tertiary-container": "#272a30",
+                "secondary-fixed-dim": "#2ae500",
+                "on-tertiary": "#2e3037",
+                "surface-tint": "#adc7ff",
+                "error": "#ffb4ab"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "base": "8px",
+                "gutter-mobile": "16px",
+                "xl": "80px",
+                "sm": "12px",
+                "safe-area-tv": "5%",
+                "md": "24px",
+                "xs": "4px",
+                "lg": "48px"
+              },
+              "fontFamily": {
+                "display-tv": ["Sora"],
+                "body-md": ["Hanken Grotesk"],
+                "headline-md": ["Sora"],
+                "headline-lg-mobile": ["Sora"],
+                "headline-sm": ["Sora"],
+                "label-bold": ["Sora"],
+                "body-lg": ["Hanken Grotesk"],
+                "display-mobile": ["Sora"],
+                "headline-lg": ["Sora"]
+              },
+              "fontSize": {
+                "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary min-h-screen flex flex-col overflow-hidden">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-xs"><div class="flex items-center gap-sm"><span class="material-symbols-outlined text-primary text-xl">grid_view</span><h1 class="font-display-mobile text-headline-sm text-primary tracking-tighter italic leading-none">QuizSpot</h1></div><div class="flex items-center gap-md"><div class="bg-surface-container-high px-sm py-xs rounded-lg border border-outline-variant"><span class="text-xs font-label-bold text-outline">PIN: 882 109</span></div><div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary"><img alt="Host Admin Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpsUv7iucbEhNEVd2Htprj4ibrqodk5f7T2aSUOToPhfWw-inibK4LFoYfCpmvUY6NphnCCv0EbbHf3HKEvQcDGdwdVFRg04JPDgpWS7QVWrdz3lcMe4-l2wKhTntDL2m9tiVrJ1g7GPwkBStHLl-MYX6JxVJ1PUm2ETX0vO1OMWo5WptfhWfatvFJzFikjolvYM425xw_Y-6a9maT7rogPR97BWppI8K2Ds4lOeGQgqpDlajwJurUAB4OKwctyj2j-H20GSYtu5gU"></div></div></header>
+<!-- Main Game Canvas -->
+<main class="flex-grow pb-8 px-4 flex flex-col gap-4 h-screen pt-12">
+<div class="flex justify-between items-center bg-surface-container/40 backdrop-blur-md p-4 rounded-xl border border-white/5">
+<div class="flex flex-col">
+<span class="text-outline font-label-bold text-xs uppercase tracking-widest">Question 12/20</span>
+<span class="text-primary font-headline-sm text-lg">Multiple Choice</span>
+</div>
+<div class="relative w-16 h-16 flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-secondary-fixed neon-glow-green transition-all duration-1000" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="175.9" stroke-dashoffset="40" stroke-width="4"></circle>
+</svg>
+<span class="font-headline-sm text-secondary-fixed text-xl z-10">14</span>
+</div>
+</div>
+<div class="flex-grow grid grid-cols-2 grid-rows-2 gap-4 pb-4">
+<button class="group relative flex items-center justify-center bg-red-600 rounded-2xl active:scale-95 transition-transform duration-150 overflow-hidden shadow-2xl neon-glow-red border-4 border-red-500/50" onclick="handlePress('red')">
+<div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+<span class="material-symbols-outlined text-white text-[120px] sm:text-[160px] group-active:scale-90 transition-transform" style="font-variation-settings: 'FILL' 1;">change_history</span>
+</button>
+<button class="group relative flex items-center justify-center bg-blue-600 rounded-2xl active:scale-95 transition-transform duration-150 overflow-hidden shadow-2xl neon-glow-blue border-4 border-blue-500/50" onclick="handlePress('blue')">
+<div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+<span class="material-symbols-outlined text-white text-[120px] sm:text-[160px] group-active:scale-90 transition-transform" style="font-variation-settings: 'FILL' 1;">pentagon</span>
+</button>
+<button class="group relative flex items-center justify-center bg-yellow-500 rounded-2xl active:scale-95 transition-transform duration-150 overflow-hidden shadow-2xl neon-glow-yellow border-4 border-yellow-400/50" onclick="handlePress('yellow')">
+<div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+<span class="material-symbols-outlined text-white text-[120px] sm:text-[160px] group-active:scale-90 transition-transform" style="font-variation-settings: 'FILL' 1;">circle</span>
+</button>
+<button class="group relative flex items-center justify-center bg-green-600 rounded-2xl active:scale-95 transition-transform duration-150 overflow-hidden shadow-2xl neon-glow-green border-4 border-green-500/50" onclick="handlePress('green')">
+<div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+<span class="material-symbols-outlined text-white text-[120px] sm:text-[160px] group-active:scale-90 transition-transform" style="font-variation-settings: 'FILL' 1;">square</span>
+</button>
+</div>
+</main>
+<!-- Bottom Indicator / Status -->
+<footer class="h-20 w-full px-gutter-mobile flex items-center justify-center bg-surface-container-lowest/80 backdrop-blur-2xl rounded-t-xl z-50">
+<div class="flex items-center gap-sm bg-surface-container-high px-4 py-2 rounded-full border border-white/5">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-secondary-fixed"></span>
+</span>
+<p class="font-label-bold text-label-bold text-on-surface">CONNECTED: GAMEMASTER_01</p>
+</div>
+</footer>
+<!-- Overlay Micro-interactions -->
+<div class="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center opacity-0 transition-opacity duration-300" id="feedback-overlay">
+<div class="bg-white/10 backdrop-blur-3xl p-lg rounded-full border-2 border-white/20">
+<span class="material-symbols-outlined text-[120px] text-white" id="feedback-icon">check_circle</span>
+</div>
+</div>
+<script>
+        function handlePress(color) {
+            // Haptic-like interaction feedback
+            const overlay = document.getElementById('feedback-overlay');
+            const icon = document.getElementById('feedback-icon');
+            
+            // Map colors to visual symbols for feedback
+            const icons = {
+                'red': 'change_history',
+                'blue': 'pentagon',
+                'yellow': 'circle',
+                'green': 'square'
+            };
+
+            icon.innerText = icons[color];
+            overlay.classList.remove('opacity-0');
+            overlay.classList.add('opacity-100');
+            
+            // Temporary glow intensity
+            document.body.style.backgroundColor = `var(--tw-color-${color}-900)`;
+            
+            setTimeout(() => {
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                document.body.style.backgroundColor = '';
+            }, 300);
+
+            // Audio feedback placeholder
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(440, context.currentTime);
+                gain.gain.setValueAtTime(0.1, context.currentTime);
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.05);
+            } catch(e) {}
+        }
+
+        // Prevent accidental scrolling/bouncing on mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('main')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+
+
+
+
+</body></html>

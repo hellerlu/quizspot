@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en" style="--timer-color: #ffb4ab;"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QUIZMASTER - Live Game</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .timer-glow {
+            filter: drop-shadow(0 0 15px var(--timer-color, #79ff5b));
+        }
+        body {
+            background-color: #10131b;
+            color: #e0e2ed;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        .pulse-active {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#001a41",
+                      "outline-variant": "#414754",
+                      "on-secondary": "#053900",
+                      "on-primary-container": "#00285b",
+                      "tertiary-fixed": "#e1e2eb",
+                      "surface-container-low": "#181c23",
+                      "primary-container": "#4a8eff",
+                      "primary-fixed": "#d8e2ff",
+                      "secondary-fixed": "#79ff5b",
+                      "on-tertiary-fixed": "#191c22",
+                      "inverse-on-surface": "#2d3039",
+                      "on-secondary-fixed-variant": "#095300",
+                      "background": "#10131b",
+                      "primary-fixed-dim": "#adc7ff",
+                      "primary": "#adc7ff",
+                      "tertiary-fixed-dim": "#c4c6cf",
+                      "surface": "#10131b",
+                      "surface-container-highest": "#31353d",
+                      "on-primary": "#002e68",
+                      "on-secondary-fixed": "#022100",
+                      "surface-bright": "#363942",
+                      "inverse-primary": "#005bc0",
+                      "on-primary-fixed-variant": "#004493",
+                      "outline": "#8b90a0",
+                      "error-container": "#93000a",
+                      "secondary-container": "#2ff801",
+                      "surface-container": "#1c2027",
+                      "tertiary-container": "#8e9099",
+                      "surface-container-high": "#272a32",
+                      "on-error": "#690005",
+                      "surface-container-lowest": "#0b0e16",
+                      "on-tertiary-fixed-variant": "#44474e",
+                      "on-surface-variant": "#c1c6d7",
+                      "surface-dim": "#10131b",
+                      "tertiary": "#c4c6cf",
+                      "inverse-surface": "#e0e2ed",
+                      "secondary": "#d7ffc5",
+                      "on-background": "#e0e2ed",
+                      "on-secondary-container": "#0f6d00",
+                      "surface-variant": "#31353d",
+                      "on-error-container": "#ffdad6",
+                      "on-surface": "#e0e2ed",
+                      "on-tertiary-container": "#272a30",
+                      "secondary-fixed-dim": "#2ae500",
+                      "on-tertiary": "#2e3037",
+                      "surface-tint": "#adc7ff",
+                      "error": "#ffb4ab"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "gutter-mobile": "16px",
+                      "xl": "80px",
+                      "sm": "12px",
+                      "safe-area-tv": "5%",
+                      "md": "24px",
+                      "xs": "4px",
+                      "lg": "48px"
+              },
+              "fontFamily": {
+                      "display-tv": ["Sora"],
+                      "body-md": ["Hanken Grotesk"],
+                      "headline-md": ["Sora"],
+                      "headline-lg-mobile": ["Sora"],
+                      "headline-sm": ["Sora"],
+                      "label-bold": ["Sora"],
+                      "body-lg": ["Hanken Grotesk"],
+                      "display-mobile": ["Sora"],
+                      "headline-lg": ["Sora"]
+              },
+              "fontSize": {
+                      "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                      "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                      "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                      "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                      "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                      "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                      "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Top Navigation Anchor (Host View) -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-lg py-xs">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary text-label-bold">grid_view</span>
+<h1 class="font-display-tv text-primary tracking-tighter italic text-label-bold" style="opacity: 1;">QuizSpot</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="glass-panel px-md py-xs rounded-full flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-fixed text-label-bold">sensors</span>
+<span class="font-label-bold text-label-bold text-secondary-fixed">LIVE ROOM: 882 104</span>
+</div>
+<!-- Circular Timer Moved to Top Right -->
+<div class="relative w-16 h-16 rounded-full flex items-center justify-center ml-md">
+<svg class="absolute inset-0 w-full h-full -rotate-90">
+<circle class="text-white/10" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+<circle class="timer-glow transition-all duration-1000 text-error" cx="32" cy="32" fill="transparent" id="timer-ring" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="0" stroke-linecap="round" stroke-width="4" style="stroke-dashoffset: 176px;"></circle>
+</svg>
+<div class="text-center z-10">
+<div class="font-display-tv text-label-bold text-on-surface text-error" id="countdown-text">0</div>
+</div>
+</div>
+<img alt="Host Avatar" class="w-12 h-12 rounded-full border-2 border-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbaXPlEHSgsfBm5dtxF1BvfGwaxxU6WPFjeeer_BgcwBijMP9Sp9_kuG4yKIS8vooX1HMIAto7XbcNrJ_649ofR67DGeKzUlKtdlTHgvyDOc4SRNgivIQv3yvpUNF4pqHiDQs3XuZ0UXISTAhb7zNMjcHkbZCxpIhjkic_GmMQ7jFFxxrdi2J4KGw8VZsVO2SXz9eTuge2Xk8BjhvE8Vj17Z4bR_PDn4n-7w7OESfeSMerItSDuIvk4SgX4BpVGrD35kcaVrs-VXVX" style="width: 32px; height: 32px;"/>
+</div>
+</header>
+<!-- Main Game Canvas -->
+<main class="h-screen w-full flex flex-col justify-start items-center px-safe-area-tv pt-xl pb-md">
+<!-- Question Section -->
+<section class="w-full text-center mb-sm">
+<div class="inline-block px-md py-xs mb-xs rounded-lg glass-panel text-primary font-label-bold uppercase tracking-widest text-xs">
+                Question 4 of 10
+            </div>
+<h2 class="font-display-tv text-headline-lg-mobile lg:text-headline-sm text-on-surface max-w-5xl mx-auto leading-tight">
+                What is the capital of France?
+            </h2>
+</section>
+<!-- Central Image Section -->
+<section class="w-full max-w-4xl px-md mb-md">
+<div class="relative aspect-video rounded-2xl overflow-hidden border-2 border-primary/20 neon-glow-primary">
+<img alt="Eiffel Tower at Night" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZk2n4pv0wB5OInfiPzNPmOLwfxWCtrRcBT7o50noDaifHNbhKh-q6JgTfD4ULpoOh5hGDw0gWxsz1z3AVj5ge6Zd2QW4ZAlrtjj-wQt8M9Y7h_x0OgWaWxxe4sPosYzxz06ZpWzAx10Beg4K420shRP2h1_Mo2CCLzK0iso8KXy9wFwayDRDY_DRsbjIUOex5-UxrZM1VBRm5FhKA1da9xRm9yzXbk9ODk-BX2uJnuAJrDQWhvLSRhBJjqsOAEiw5zMko9b8VFXoF"/>
+</div>
+</section>
+<!-- Option Grid (2x2) -->
+<section class="grid grid-cols-2 gap-sm w-full max-w-7xl h-1/4">
+<!-- Option A: Red Triangle -->
+<div class="relative group cursor-pointer transition-all duration-200 active:scale-95">
+<div class="absolute inset-0 bg-error rounded-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+<div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-error">
+<span class="material-symbols-outlined text-headline-sm text-error mr-sm" style="font-variation-settings: 'FILL' 1;">change_history</span>
+<span class="font-headline-sm lg:font-headline-md text-on-surface">Paris</span>
+</div>
+</div>
+<!-- Option B: Blue Diamond -->
+<div class="relative group cursor-pointer transition-all duration-200 active:scale-95">
+<div class="absolute inset-0 bg-primary rounded-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+<div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-primary">
+<span class="material-symbols-outlined text-headline-sm text-primary mr-sm" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<span class="font-headline-sm lg:font-headline-md text-on-surface">London</span>
+</div>
+</div>
+<!-- Option C: Yellow Circle -->
+<div class="relative group cursor-pointer transition-all duration-200 active:scale-95">
+<div class="absolute inset-0 bg-tertiary-container rounded-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+<div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-tertiary-container">
+<span class="material-symbols-outlined text-headline-sm text-tertiary-container mr-sm" style="font-variation-settings: 'FILL' 1;">circle</span>
+<span class="font-headline-sm lg:font-headline-md text-on-surface">Berlin</span>
+</div>
+</div>
+<!-- Option D: Green Square -->
+<div class="relative group cursor-pointer transition-all duration-200 active:scale-95">
+<div class="absolute inset-0 bg-secondary-fixed-dim rounded-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+<div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-secondary-fixed-dim">
+<span class="material-symbols-outlined text-headline-sm text-secondary-fixed-dim mr-sm" style="font-variation-settings: 'FILL' 1;">square</span>
+<span class="font-headline-sm lg:font-headline-md text-on-surface">Madrid</span>
+</div>
+</div>
+</section>
+<!-- Repositioned & Thinned Answers Received Indicator -->
+<div class="w-full max-w-7xl mt-md">
+<div class="flex flex-col gap-xs max-w-xs ml-0">
+<div class="flex justify-between items-center">
+<span class="font-label-bold text-xs text-outline uppercase tracking-wider">Answers Received</span>
+<span class="font-label-bold text-sm text-primary">8 <span class="text-on-surface-variant font-body-md text-xs">/ 12</span></span>
+</div>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[66%] transition-all duration-500 shadow-[0_0_8px_rgba(173,199,255,0.8)]"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Player Avatars -->
+<footer class="fixed bottom-0 w-full z-50 px-lg py-sm flex justify-end items-end">
+<div class="flex gap-md">
+<div class="flex -space-x-4">
+<img alt="Player 1" class="w-10 h-10 rounded-full border-2 border-background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9glqI6g1S_2TotUj9MUewyYQ5p72N0a6fQIEhiOyQiHriFlbmnAibDv4YrEJQRowZIdeX_SrT9OV78sQbqoTj86WhXxCFmAk_KB37e6pdZ8EepJMoWmO-4BJpAVBbfuSOHKT_1Wg-KFLO7OyXcfOXWeA9nHNFq6JXacR18PUk5ANwBK7LkIl7tquIcip6VU52E4FKtYQqKBa8Cn9u1OSrSYxQQzSCSFM4ItVR-jNA9QTHgwyBLNQMyg905xg60znfxNoWJ52IWWlJ"/>
+<img alt="Player 2" class="w-10 h-10 rounded-full border-2 border-background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp-J5msDqBbEhS_kXcT-qEzFSpGhsrZOdvXB67ei4xIYLTqF0PGrkMHnwtdfHay130UM5Dhx8FbqZnauEE47ZJX79EYLew7tPm1mf-4L1GaaboopSkTZ54_i2T8ULlZbBS20VIj1DfNIist1TeC7K3rL1fihvWy6z5P7CjVx7TQvGXVioHFfgpiqtpwKOnn-Obiue6KdyqpDNK0_G_QqhfLAJ7eFpPOzp-poNzztMC4G0Q8ljKTT74swb9313AltsugelO2_znGuJE"/>
+<img alt="Player 3" class="w-10 h-10 rounded-full border-2 border-background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbWipEXo0K6N_jWNJpzCe6-6ekhwwha0WslWbzis761JGhKq9OUqJTwOqYd36HobduEiZYD_EwTg1K1Hj5IihX_x0zswtn2TQHmAs-DiQnhwEke3esZERcbAV4dQQ2ZCXO7wWFBr_941wQTlLTnNXcYwy6xEvqs9b28z8oqllZY9JQVqlXIpFWuOhKl3xwSmNx3bGqcg7pCieiyCUI2lY0hbXj5NjZt9m6G8cpdTxgTSly9Z7KbbFPqaUMXH-mp-nnF15cqLOfwEsF"/>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-background flex items-center justify-center font-label-bold text-[10px] text-on-surface">
+                    +5
+                </div>
+</div>
+</div>
+</footer>
+<!-- Background Atmospheric Glows -->
+<div class="fixed top-0 -left-20 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -z-10"></div>
+<div class="fixed bottom-0 -right-20 w-[600px] h-[600px] bg-secondary-fixed/10 rounded-full blur-[150px] -z-10"></div>
+<script>
+        // Simple Countdown Interaction
+        let timeLeft = 15;
+        const countdownEl = document.getElementById('countdown-text');
+        const ringEl = document.getElementById('timer-ring');
+        const totalOffset = 176; // Circumference of the new smaller circle (2 * PI * 28)
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timeLeft = 0;
+            }
+            
+            countdownEl.textContent = timeLeft;
+            
+            // Update Ring Offset
+            const progress = timeLeft / 15;
+            const offset = totalOffset * progress;
+            ringEl.style.strokeDashoffset = totalOffset - offset;
+
+            // Change color as it gets urgent
+            if (timeLeft <= 5) {
+                ringEl.classList.remove('text-secondary-fixed');
+                ringEl.classList.add('text-error');
+                countdownEl.classList.add('text-error');
+                document.documentElement.style.setProperty('--timer-color', '#ffb4ab');
+            }
+        }, 1000);
+
+        // Subtle parallax or hover effect for cards
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

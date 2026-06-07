@@ -1,0 +1,51 @@
+[
+  {
+    "id": 2,
+    "question": "Which of these colors represents the Circle option in our game show grid?",
+    "options": [
+      "Red (Triangle) - ablasdfasdfasdfasdfasdfasdfasdfasdfasdfa",
+      "Blue (Diamond)",
+      "Yellow (Circle)",
+      "Green (Square)"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 15,
+    "image": "/assets/avatars.png"
+  },
+  {
+    "id": 3,
+    "question": "Which programming language was developed by Brendan Eich in 1995 for Netscape?",
+    "options": [
+      "Java",
+      "Python",
+      "JavaScript",
+      "Ruby"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 4,
+    "question": "What is the speed of light in a vacuum approximately?",
+    "options": [
+      "300,000 km/s",
+      "150,000 km/s",
+      "500,000 km/s",
+      "1,000,000 km/s"
+    ],
+    "correctIndex": 0,
+    "timeLimit": 20
+  },
+  {
+    "id": 5,
+    "question": "Which of the following is NOT a core feature of Alpine.js?",
+    "options": [
+      "x-data",
+      "x-model",
+      "x-show",
+      "x-redux"
+    ],
+    "correctIndex": 3,
+    "timeLimit": 15
+  }
+]

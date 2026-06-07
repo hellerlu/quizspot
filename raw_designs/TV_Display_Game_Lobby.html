@@ -1,0 +1,348 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001a41",
+                    "outline-variant": "#414754",
+                    "on-secondary": "#053900",
+                    "on-primary-container": "#00285b",
+                    "tertiary-fixed": "#e1e2eb",
+                    "surface-container-low": "#181c23",
+                    "primary-container": "#4a8eff",
+                    "primary-fixed": "#d8e2ff",
+                    "secondary-fixed": "#79ff5b",
+                    "on-tertiary-fixed": "#191c22",
+                    "inverse-on-surface": "#2d3039",
+                    "on-secondary-fixed-variant": "#095300",
+                    "background": "#10131b",
+                    "primary-fixed-dim": "#adc7ff",
+                    "primary": "#adc7ff",
+                    "tertiary-fixed-dim": "#c4c6cf",
+                    "surface": "#10131b",
+                    "surface-container-highest": "#31353d",
+                    "on-primary": "#002e68",
+                    "on-secondary-fixed": "#022100",
+                    "surface-bright": "#363942",
+                    "inverse-primary": "#005bc0",
+                    "on-primary-fixed-variant": "#004493",
+                    "outline": "#8b90a0",
+                    "error-container": "#93000a",
+                    "secondary-container": "#2ff801",
+                    "surface-container": "#1c2027",
+                    "tertiary-container": "#8e9099",
+                    "surface-container-high": "#272a32",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#0b0e16",
+                    "on-tertiary-fixed-variant": "#44474e",
+                    "on-surface-variant": "#c1c6d7",
+                    "surface-dim": "#10131b",
+                    "tertiary": "#c4c6cf",
+                    "inverse-surface": "#e0e2ed",
+                    "secondary": "#d7ffc5",
+                    "on-background": "#e0e2ed",
+                    "on-secondary-container": "#0f6d00",
+                    "surface-variant": "#31353d",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#e0e2ed",
+                    "on-tertiary-container": "#272a30",
+                    "secondary-fixed-dim": "#2ae500",
+                    "on-tertiary": "#2e3037",
+                    "surface-tint": "#adc7ff",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "gutter-mobile": "16px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "safe-area-tv": "5%",
+                    "md": "24px",
+                    "xs": "4px",
+                    "lg": "48px"
+            },
+            "fontFamily": {
+                    "display-tv": ["Sora"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-md": ["Sora"],
+                    "headline-lg-mobile": ["Sora"],
+                    "headline-sm": ["Sora"],
+                    "label-bold": ["Sora"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display-mobile": ["Sora"],
+                    "headline-lg": ["Sora"]
+            },
+            "fontSize": {
+                    "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                    "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                    "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                    "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .neon-glow-secondary {
+            box-shadow: 0 0 20px rgba(121, 255, 91, 0.3);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden selection:bg-primary selection:text-on-primary min-h-screen flex flex-col font-body-md">
+<!-- Top Navigation Bar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-lg py-sm">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary text-2xl">grid_view</span>
+<h1 class="font-display-tv text-headline-sm text-primary tracking-tighter italic">QuizSpot</h1>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex flex-col items-end">
+<span class="font-label-bold text-label-bold text-outline">PIN CODE</span>
+<span class="font-headline-sm text-secondary-fixed tracking-widest">882 109</span>
+</div>
+<img alt="Admin" class="rounded-full border-2 border-primary/30 p-1 h-8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm2qig5C7Zoo7KIvkql8akBlJo893umd1SiS7RuD4zLWvub7Eoq4FM150GksBe0N4KOQ_Vnm9Ry6riORIVejLEh6ckSSeZ28Atr5_hEImwaKindJYptTQwnudC6KBWOwetXQb20nZnp381pkUtTMPbhPFb9OGD5lnT3rzfq5jqNxPp_cum-joKf1tMPZUgp_CGx5IpNH88N3V8PRT71pIjFxTizZ-wg_SqqhZ14e-EdpVN-XBGamJ-ZAyuGm1C4KScIUsnxwb5MRRp">
+</div>
+</header>
+<!-- Main TV Content Area -->
+<main class="flex-1 flex flex-col pb-xl px-[5%] pt-24">
+<!-- Center Lobby Section -->
+<div class="flex-1 grid grid-cols-12 gap-lg items-center">
+<!-- Left Side: Instructions & QR -->
+<div class="col-span-5 flex flex-col gap-lg items-start">
+<div class="space-y-sm">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Waiting for Players...</h2>
+<p class="font-body-lg text-body-lg text-outline-variant max-w-md">Join the game to test your knowledge against friends in real-time!</p>
+</div>
+<div class="glass-panel p-md rounded-xl flex flex-col gap-md w-full">
+<div class="flex items-center gap-md text-secondary-fixed">
+<span class="material-symbols-outlined text-4xl">link</span>
+<span class="font-headline-sm text-headline-sm">Join at: 192.168.43.1:8080</span>
+</div>
+<div class="h-px bg-white/10 w-full"></div>
+<div class="flex items-center gap-md text-primary">
+<span class="material-symbols-outlined text-4xl">qr_code_2</span>
+<span class="font-headline-sm text-headline-sm">Scan to connect instantly</span>
+</div>
+</div>
+</div>
+<!-- Middle: Massive QR Code -->
+<div class="col-span-4 flex justify-center">
+<div class="relative animate-float">
+<div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
+<div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
+<img alt="Join Game QR Code" class="w-64 h-64 md:w-80 md:h-80" data-alt="A clean, high-contrast QR code centered on a crisp white square with rounded corners. The QR code is detailed and sharp, designed for digital display. It rests against a dark, futuristic background with subtle neon blue highlights, giving it a modern and high-tech aesthetic suitable for a broadcast television game show interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClQtCJMdUmyc0mF6ElL1Zh8UtHxxslhn9ka8m3n3rA_sVIy1QvienJ6nP_qGHYpsuK20Izi6qkbG15te77v1mZctVlM2YPWb_i5ui9I3OSaDLF31EVup-r7EX3Qt6s-TBOgfkYpRTT5UhcmKhhWwo6kPECBZRB1Ou4_tUBfxGq01k69epp6e3aNF_3vSpl6eUc1CvgVsy-HoAY22dInvwDKALe_5xnzjZfZDZhyBb2IdYPCuntjob_TBIArOf_HGe0WanFVvqOWyyR">
+</div>
+</div>
+</div>
+<!-- Right Side: Stats/Game Info -->
+<div class="col-span-3 flex flex-col gap-md">
+<div class="glass-panel p-lg rounded-2xl flex flex-col items-center justify-center text-center gap-xs">
+<span class="text-label-bold font-label-bold text-outline-variant uppercase tracking-widest">Players Joined</span>
+<span class="font-display-tv text-display-tv text-secondary-fixed" id="player-count">24</span>
+</div>
+<div class="glass-panel p-md rounded-xl flex items-center gap-md">
+<span class="material-symbols-outlined text-primary text-3xl">sports_esports</span>
+<div class="flex flex-col">
+<span class="font-label-bold text-outline">Category</span>
+<span class="font-headline-sm text-headline-sm">Pop Culture</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Players Grid (Neon Chips) -->
+<div class="mt-xl">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-sm text-headline-sm text-outline">Player Lobby</h3>
+<div class="flex gap-xs items-center text-secondary-fixed">
+<span class="w-3 h-3 bg-secondary-fixed rounded-full animate-pulse"></span>
+<span class="font-label-bold">Live</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-md" id="player-grid">
+<!-- Alex -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default neon-glow-primary">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xl">A</div>
+<span class="font-headline-sm text-body-lg text-primary">Alex</span>
+</div>
+<!-- Max -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default neon-glow-secondary">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xl">M</div>
+<span class="font-headline-sm text-body-lg text-secondary-fixed">Max</span>
+</div>
+<!-- Sarah -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold text-xl">S</div>
+<span class="font-headline-sm text-body-lg text-tertiary">Sarah</span>
+</div>
+<!-- Chris -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-on-primary-fixed-variant flex items-center justify-center text-primary font-bold text-xl">C</div>
+<span class="font-headline-sm text-body-lg text-on-primary-fixed-variant">Chris</span>
+</div>
+<!-- Jordan -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xl">J</div>
+<span class="font-headline-sm text-body-lg text-primary">Jordan</span>
+</div>
+<!-- Riley -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed-dim flex items-center justify-center text-on-secondary font-bold text-xl">R</div>
+<span class="font-headline-sm text-body-lg text-secondary-fixed-dim">Riley</span>
+</div>
+<!-- Taylor -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-surface-bright flex items-center justify-center text-primary font-bold text-xl">T</div>
+<span class="font-headline-sm text-body-lg text-on-surface-variant">Taylor</span>
+</div>
+<!-- Casey -->
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default">
+<div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary-container font-bold text-xl">K</div>
+<span class="font-headline-sm text-body-lg text-secondary">Casey</span>
+</div>
+<div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-tertiary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-tertiary flex items-center justify-center text-on-surface font-bold text-xl">E</div>
+                <span class="font-headline-sm text-body-lg text-tertiary">Emma</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-surface font-bold text-xl">N</div>
+                <span class="font-headline-sm text-body-lg text-primary">Noah</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-surface font-bold text-xl">A</div>
+                <span class="font-headline-sm text-body-lg text-primary">Ava</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary-fixed-dim/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-surface font-bold text-xl">A</div>
+                <span class="font-headline-sm text-body-lg text-primary-fixed-dim">Ava</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-primary-fixed-dim/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-surface font-bold text-xl">A</div>
+                <span class="font-headline-sm text-body-lg text-primary-fixed-dim">Ava</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-surface font-bold text-xl">N</div>
+                <span class="font-headline-sm text-body-lg text-secondary-fixed">Noah</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-surface font-bold text-xl">L</div>
+                <span class="font-headline-sm text-body-lg text-secondary-fixed">Liam</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-tertiary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-tertiary flex items-center justify-center text-on-surface font-bold text-xl">E</div>
+                <span class="font-headline-sm text-body-lg text-tertiary">Ethan</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-tertiary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-tertiary flex items-center justify-center text-on-surface font-bold text-xl">E</div>
+                <span class="font-headline-sm text-body-lg text-tertiary">Ethan</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-surface font-bold text-xl">N</div>
+                <span class="font-headline-sm text-body-lg text-secondary-fixed">Noah</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-secondary-fixed/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-surface font-bold text-xl">S</div>
+                <span class="font-headline-sm text-body-lg text-secondary-fixed">Sophia</span>
+            </div><div class="group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-tertiary/50 transition-all cursor-default scale-100">
+                <div class="w-12 h-12 rounded-full bg-tertiary flex items-center justify-center text-on-surface font-bold text-xl">N</div>
+                <span class="font-headline-sm text-body-lg text-tertiary">Noah</span>
+            </div></div>
+</div>
+</main>
+<!-- Footer Action Bar -->
+<footer class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container-lowest/80 backdrop-blur-2xl flex justify-between items-center h-24 px-lg shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline-variant text-4xl">group</span>
+<span class="font-headline-sm text-on-surface">Min. 4 players needed to start</span>
+</div>
+<button class="bg-primary-container text-on-primary-container px-lg py-md rounded-full font-label-bold text-2xl flex items-center gap-md hover:scale-105 active:scale-95 transition-all shadow-lg neon-glow-primary group disabled:opacity-50 disabled:grayscale disabled:scale-100" id="start-btn">
+            START GAME
+            <span class="material-symbols-outlined font-bold group-hover:translate-x-2 transition-transform">play_arrow</span>
+</button>
+</footer>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/10 rounded-full blur-[160px]"></div>
+<div class="absolute bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-secondary-fixed/5 rounded-full blur-[160px]"></div>
+</div>
+<script>
+        // Micro-interaction: Simulation of new players joining
+        const playerGrid = document.getElementById('player-grid');
+        const playerCount = document.getElementById('player-count');
+        const names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Lucas'];
+        const colors = ['primary', 'secondary-fixed', 'tertiary', 'primary-fixed-dim'];
+        
+        let count = 12;
+
+        function addRandomPlayer() {
+            if (count >= 24) return;
+            
+            const name = names[Math.floor(Math.random() * names.length)];
+            const colorClass = colors[Math.floor(Math.random() * colors.length)];
+            
+            const playerDiv = document.createElement('div');
+            playerDiv.className = `group flex items-center gap-md bg-surface-container-highest p-sm rounded-full border border-white/5 hover:border-${colorClass}/50 transition-all cursor-default scale-0`;
+            playerDiv.innerHTML = `
+                <div class="w-12 h-12 rounded-full bg-${colorClass} flex items-center justify-center text-on-surface font-bold text-xl">${name[0]}</div>
+                <span class="font-headline-sm text-body-lg text-${colorClass}">${name}</span>
+            `;
+            
+            playerGrid.appendChild(playerDiv);
+            
+            // Animation trigger
+            setTimeout(() => {
+                playerDiv.classList.remove('scale-0');
+                playerDiv.classList.add('scale-100');
+                count++;
+                playerCount.innerText = count;
+            }, 100);
+        }
+
+        // Simulate joins every 4-8 seconds
+        setInterval(() => {
+            if (Math.random() > 0.5) {
+                addRandomPlayer();
+            }
+        }, 5000);
+
+        // Interactive Start Button Simulation
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('click', () => {
+            startBtn.innerHTML = 'PREPARING... <span class="material-symbols-outlined animate-spin">refresh</span>';
+            setTimeout(() => {
+                startBtn.innerHTML = 'GET READY! <span class="material-symbols-outlined">timer</span>';
+                document.body.style.transition = 'opacity 1s';
+                document.body.style.opacity = '0';
+            }, 1500);
+        });
+    </script>
+
+
+</body></html>

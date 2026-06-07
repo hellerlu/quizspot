@@ -1,0 +1,253 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001a41",
+                    "outline-variant": "#414754",
+                    "on-secondary": "#053900",
+                    "on-primary-container": "#00285b",
+                    "tertiary-fixed": "#e1e2eb",
+                    "surface-container-low": "#181c23",
+                    "primary-container": "#4a8eff",
+                    "primary-fixed": "#d8e2ff",
+                    "secondary-fixed": "#79ff5b",
+                    "on-tertiary-fixed": "#191c22",
+                    "inverse-on-surface": "#2d3039",
+                    "on-secondary-fixed-variant": "#095300",
+                    "background": "#10131b",
+                    "primary-fixed-dim": "#adc7ff",
+                    "primary": "#adc7ff",
+                    "tertiary-fixed-dim": "#c4c6cf",
+                    "surface": "#10131b",
+                    "surface-container-highest": "#31353d",
+                    "on-primary": "#002e68",
+                    "on-secondary-fixed": "#022100",
+                    "surface-bright": "#363942",
+                    "inverse-primary": "#005bc0",
+                    "on-primary-fixed-variant": "#004493",
+                    "outline": "#8b90a0",
+                    "error-container": "#93000a",
+                    "secondary-container": "#2ff801",
+                    "surface-container": "#1c2027",
+                    "tertiary-container": "#8e9099",
+                    "surface-container-high": "#272a32",
+                    "on-error": "#690005",
+                    "surface-container-lowest": "#0b0e16",
+                    "on-tertiary-fixed-variant": "#44474e",
+                    "on-surface-variant": "#c1c6d7",
+                    "surface-dim": "#10131b",
+                    "tertiary": "#c4c6cf",
+                    "inverse-surface": "#e0e2ed",
+                    "secondary": "#d7ffc5",
+                    "on-background": "#e0e2ed",
+                    "on-secondary-container": "#0f6d00",
+                    "surface-variant": "#31353d",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#e0e2ed",
+                    "on-tertiary-container": "#272a30",
+                    "secondary-fixed-dim": "#2ae500",
+                    "on-tertiary": "#2e3037",
+                    "surface-tint": "#adc7ff",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "gutter-mobile": "16px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "safe-area-tv": "5%",
+                    "md": "24px",
+                    "xs": "4px",
+                    "lg": "48px"
+            },
+            "fontFamily": {
+                    "display-tv": ["Sora"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-md": ["Sora"],
+                    "headline-lg-mobile": ["Sora"],
+                    "headline-sm": ["Sora"],
+                    "label-bold": ["Sora"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display-mobile": ["Sora"],
+                    "headline-lg": ["Sora"]
+            },
+            "fontSize": {
+                    "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                    "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                    "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                    "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                    "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(121, 255, 91, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(121, 255, 91, 0.8)); }
+        }
+        .animate-pop { animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .success-glow { animation: pulse-glow 2s infinite; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background overflow-hidden antialiased">
+<!-- Top App Bar (Suppressing standard shell for transaction/feedback state) -->
+<!-- The TopAppBar is included but styled minimally for this feedback state -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter-mobile bg-transparent py-sm">
+<h1 class="font-display-mobile text-display-mobile text-white tracking-tighter italic opacity-30">QuizSpot</h1>
+<div class="rounded-full glass-panel flex items-center justify-center h-10 w-10">
+<img alt="Avatar" class="h-10 w-10 rounded-full" data-alt="A stylized digital avatar of a young energetic game master with trendy glasses and a bright neon hoodie. The avatar is rendered in a clean, modern vector art style with a vibrant green background that matches the electric gaming aesthetic of the application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCzyJopaHPg3Vn5FAdv1XuveuVagud7j-h8E0GdHCb_aGcAO4Hvx1KYuDiZ0wHiDQ1r-DMSTEyIqQ5WpLRA82QZ_XCPazuoao1SiQsv8mwVBZOKtEBgmeOXT39ByKQEZZMBBC40IHTn0BiFjnvpHLzaQBnrf-hnkeDuIM1g3h1OmB8_gN737o7dZdWysd50Z1pJUp35tUM9rI5yF0nms8iKftsinOrRUGtk00TmsCnAYsi29hM0yk6jw2KDOhs5837hV7X3MZkUqOG">
+</div>
+</header>
+<!-- Full Screen Correct State Canvas -->
+<main class="relative h-screen w-screen flex flex-col items-center justify-center bg-secondary-container transition-colors duration-500 overflow-hidden">
+<!-- Animated Background Elements -->
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-on-secondary-container blur-[100px]"></div>
+</div>
+<!-- Feedback Container -->
+<div class="z-10 flex flex-col items-center text-center px-gutter-mobile animate-pop">
+<!-- Massive Checkmark Icon -->
+<div class="mb-md animate-float success-glow">
+<span class="material-symbols-outlined text-[160px] md:text-[240px] text-white leading-none font-black" style="font-variation-settings: 'FILL' 1, 'wght' 700;">
+                    check_circle
+                </span>
+</div>
+<!-- "CORRECT!" Title -->
+<h2 class="font-display-mobile text-[56px] md:text-display-tv text-on-secondary-container tracking-tighter italic mb-xs drop-shadow-lg">
+                CORRECT!
+            </h2>
+<!-- Points Awarded Glass Card -->
+<div class="glass-panel rounded-xl px-lg py-md mb-lg transform hover:scale-105 transition-transform duration-300">
+<p class="font-headline-sm text-headline-sm text-white font-bold">
+                    +1,000 Points
+                </p>
+</div>
+<!-- Total Score Footer -->
+<div class="flex flex-col items-center">
+<p class="font-label-bold text-label-bold text-on-secondary-container opacity-70 uppercase tracking-widest mb-1">
+                    Current Score
+                </p>
+<p class="font-headline-md text-headline-md text-on-secondary-container font-extrabold">
+                    4,500
+                </p>
+</div>
+</div>
+<!-- Dynamic Content Area / Streak Indicator -->
+<div class="absolute bottom-xl w-full flex justify-center z-10 animate-pop" style="animation-delay: 0.3s;">
+<div class="flex items-center gap-base glass-panel px-md py-sm rounded-full">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-bold text-label-bold text-on-secondary-container">3 QUESTION STREAK!</span>
+</div>
+</div>
+<!-- Particle System (JavaScript injected) -->
+<div class="absolute inset-0 pointer-events-none z-20" id="confetti-container"><div class="confetti" style="left: 49.2862vw; top: 91.2058vh; width: 6.39038px; height: 6.39038px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 4.692s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.060151s;"></div><div class="confetti" style="left: 30.0344vw; top: 62.3385vh; width: 4.82397px; height: 4.82397px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 4.06375s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0619621s;"></div><div class="confetti" style="left: 19.1846vw; top: 5.36518vh; width: 11.7407px; height: 11.7407px; background-color: rgb(255, 255, 255); border-radius: 50%; transition: 2.36751s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.364574s;"></div><div class="confetti" style="left: 96.2902vw; top: 90.3372vh; width: 8.64715px; height: 8.64715px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 2.47634s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.164279s;"></div><div class="confetti" style="left: 91.6704vw; top: 81.4267vh; width: 11.6804px; height: 11.6804px; background-color: rgb(15, 109, 0); border-radius: 2px; transition: 2.71875s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.335463s;"></div><div class="confetti" style="left: 9.4217vw; top: 79.1011vh; width: 11.2776px; height: 11.2776px; background-color: rgb(15, 109, 0); border-radius: 2px; transition: 2.96631s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.470041s;"></div><div class="confetti" style="left: 58.3952vw; top: 91.7205vh; width: 11.0186px; height: 11.0186px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 3.8366s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.165133s;"></div><div class="confetti" style="left: 97.1813vw; top: 2.03445vh; width: 11.6559px; height: 11.6559px; background-color: rgb(255, 255, 255); border-radius: 2px; transition: 4.25336s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.225793s;"></div><div class="confetti" style="left: 10.8307vw; top: 30.4642vh; width: 6.73769px; height: 6.73769px; background-color: rgb(255, 255, 255); border-radius: 2px; transition: 3.32961s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.126945s;"></div><div class="confetti" style="left: 38.3985vw; top: 96.7524vh; width: 10.8361px; height: 10.8361px; background-color: rgb(255, 255, 255); border-radius: 2px; transition: 3.70961s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.218245s;"></div><div class="confetti" style="left: 88.7243vw; top: 2.04392vh; width: 11.439px; height: 11.439px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 2.19323s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.298103s;"></div><div class="confetti" style="left: 64.9988vw; top: 93.7985vh; width: 9.94426px; height: 9.94426px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 3.49091s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.330728s;"></div><div class="confetti" style="left: 43.0576vw; top: 53.0087vh; width: 6.61909px; height: 6.61909px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 2.00007s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.376703s;"></div><div class="confetti" style="left: 59.1219vw; top: 67.7792vh; width: 4.38281px; height: 4.38281px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 3.39402s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.313611s;"></div><div class="confetti" style="left: 42.0579vw; top: 52.6455vh; width: 4.66899px; height: 4.66899px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 3.97362s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.37662s;"></div><div class="confetti" style="left: 32.6061vw; top: 99.188vh; width: 11.0188px; height: 11.0188px; background-color: rgb(255, 255, 255); border-radius: 50%; transition: 3.00291s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0986322s;"></div><div class="confetti" style="left: 4.93771vw; top: 69.7128vh; width: 4.5349px; height: 4.5349px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 4.41044s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0814834s;"></div><div class="confetti" style="left: 27.8301vw; top: 74.7066vh; width: 5.48203px; height: 5.48203px; background-color: rgb(255, 255, 255); border-radius: 50%; transition: 3.86552s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0684383s;"></div><div class="confetti" style="left: 25.9092vw; top: 30.9518vh; width: 5.80447px; height: 5.80447px; background-color: rgb(255, 255, 255); border-radius: 2px; transition: 4.42149s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.41643s;"></div><div class="confetti" style="left: 63.5671vw; top: 57.427vh; width: 4.50817px; height: 4.50817px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 2.71769s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0115304s;"></div><div class="confetti" style="left: 63.3741vw; top: 99.9614vh; width: 8.37476px; height: 8.37476px; background-color: rgb(15, 109, 0); border-radius: 2px; transition: 2.80551s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.366232s;"></div><div class="confetti" style="left: 17.0601vw; top: 68.9997vh; width: 11.9906px; height: 11.9906px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 4.88266s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.441904s;"></div><div class="confetti" style="left: 38.7515vw; top: 7.20484vh; width: 6.21103px; height: 6.21103px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 4.37248s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.154596s;"></div><div class="confetti" style="left: 66.3909vw; top: 17.2536vh; width: 4.06108px; height: 4.06108px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 2.8473s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.429246s;"></div><div class="confetti" style="left: 68.2982vw; top: 45.3862vh; width: 11.8831px; height: 11.8831px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 2.01516s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.168598s;"></div><div class="confetti" style="left: 41.6224vw; top: 74.6643vh; width: 4.65408px; height: 4.65408px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 3.68988s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.39623s;"></div><div class="confetti" style="left: 82.0307vw; top: 44.1947vh; width: 6.01527px; height: 6.01527px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 2.71666s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.285104s;"></div><div class="confetti" style="left: 28.0894vw; top: 70.2644vh; width: 8.12193px; height: 8.12193px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 4.94328s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.22212s;"></div><div class="confetti" style="left: 42.7318vw; top: 86.2403vh; width: 8.26011px; height: 8.26011px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 3.65086s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.319105s;"></div><div class="confetti" style="left: 1.8198vw; top: 96.6844vh; width: 7.01758px; height: 7.01758px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 4.60286s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.251625s;"></div><div class="confetti" style="left: 36.776vw; top: 24.8035vh; width: 4.08993px; height: 4.08993px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 3.338s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.484185s;"></div><div class="confetti" style="left: 71.5846vw; top: 59.9955vh; width: 10.6864px; height: 10.6864px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 4.44304s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.293698s;"></div><div class="confetti" style="left: 12.781vw; top: 67.3785vh; width: 5.22692px; height: 5.22692px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 4.744s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.430951s;"></div><div class="confetti" style="left: 67.7075vw; top: 5.16997vh; width: 7.61765px; height: 7.61765px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 3.98343s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.243708s;"></div><div class="confetti" style="left: 22.684vw; top: 6.90134vh; width: 5.03264px; height: 5.03264px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 2.5223s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.438514s;"></div><div class="confetti" style="left: 14.1045vw; top: 13.443vh; width: 9.46613px; height: 9.46613px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 3.52527s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.271234s;"></div><div class="confetti" style="left: 68.6857vw; top: 55.2652vh; width: 9.56967px; height: 9.56967px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 3.51255s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.050759s;"></div><div class="confetti" style="left: 49.2927vw; top: 22.0777vh; width: 4.02432px; height: 4.02432px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 4.65226s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0082836s;"></div><div class="confetti" style="left: 30.0062vw; top: 14.5628vh; width: 6.47592px; height: 6.47592px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 3.34543s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.102903s;"></div><div class="confetti" style="left: 51.9649vw; top: 32.8782vh; width: 6.23029px; height: 6.23029px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 2.32792s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.0183238s;"></div><div class="confetti" style="left: 51.2199vw; top: 51.3253vh; width: 5.95748px; height: 5.95748px; background-color: rgb(215, 255, 197); border-radius: 50%; transition: 2.958s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.303965s;"></div><div class="confetti" style="left: 63.4635vw; top: 92.4321vh; width: 7.18023px; height: 7.18023px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 2.03112s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.246662s;"></div><div class="confetti" style="left: 2.66106vw; top: 33.011vh; width: 11.7468px; height: 11.7468px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 4.37765s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.250571s;"></div><div class="confetti" style="left: 25.1505vw; top: 94.3598vh; width: 11.3326px; height: 11.3326px; background-color: rgb(15, 109, 0); border-radius: 50%; transition: 3.4483s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.347654s;"></div><div class="confetti" style="left: 25.894vw; top: 66.8461vh; width: 8.95431px; height: 8.95431px; background-color: rgb(121, 255, 91); border-radius: 2px; transition: 4.93664s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.44164s;"></div><div class="confetti" style="left: 55.5205vw; top: 95.0355vh; width: 9.2309px; height: 9.2309px; background-color: rgb(215, 255, 197); border-radius: 2px; transition: 3.24642s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.221619s;"></div><div class="confetti" style="left: 60.8521vw; top: 60.2328vh; width: 8.01052px; height: 8.01052px; background-color: rgb(15, 109, 0); border-radius: 2px; transition: 4.51699s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2386s;"></div><div class="confetti" style="left: 95.5994vw; top: 54.7775vh; width: 9.49343px; height: 9.49343px; background-color: rgb(255, 255, 255); border-radius: 2px; transition: 3.41742s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.112859s;"></div><div class="confetti" style="left: 99.8187vw; top: 91.8387vh; width: 4.14116px; height: 4.14116px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 2.06599s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.28115s;"></div><div class="confetti" style="left: 30.1745vw; top: 93.0776vh; width: 4.4737px; height: 4.4737px; background-color: rgb(121, 255, 91); border-radius: 50%; transition: 3.77722s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.261108s;"></div></div>
+</main>
+<!-- Interactivity Layer -->
+<script>
+        // Simple Confetti Generator
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#ffffff', '#79ff5b', '#0f6d00', '#d7ffc5'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random position
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 8 + 4;
+                
+                confetti.style.left = startX + 'vw';
+                confetti.style.top = startY + 'vh';
+                confetti.style.width = size + 'px';
+                confetti.style.height = size + 'px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                
+                // Animation settings
+                const duration = Math.random() * 3 + 2;
+                const delay = Math.random() * 0.5;
+                
+                confetti.style.transition = `all ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}s`;
+                
+                container.appendChild(confetti);
+                
+                // Force a reflow and then animate
+                setTimeout(() => {
+                    confetti.style.transform = `translate(${(Math.random() - 0.5) * 200}px, ${Math.random() * 300 + 100}px) rotate(${Math.random() * 360}deg)`;
+                    confetti.style.opacity = '0';
+                }, 10);
+            }
+        }
+
+        // Run on load
+        window.addEventListener('DOMContentLoaded', () => {
+            createConfetti();
+            
+            // Re-trigger every 3 seconds for loop excitement
+            setInterval(createConfetti, 4000);
+        });
+
+        // Trigger scale animation on the score for "counting" effect
+        const scoreElement = document.querySelector('.font-headline-md');
+        setTimeout(() => {
+            scoreElement.classList.add('scale-110', 'transition-transform');
+            setTimeout(() => scoreElement.classList.remove('scale-110'), 200);
+        }, 800);
+    </script>
+
+
+</body></html>

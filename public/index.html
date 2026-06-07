@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>QuizSpot | Player Controller</title>
+    <!-- Compiled Tailwind stylesheet -->
+    <link href="/assets/style.css" rel="stylesheet"/>
+    <!-- Local Google Fonts & Icons -->
+    <link href="/assets/fonts/fonts.css" rel="stylesheet"/>
+    <link href="/assets/fonts/icons.css" rel="stylesheet"/>
+    <!-- Socket.io and Alpine.js -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script defer src="/assets/libs/alpine.min.js"></script>
+    <style>
+        body {
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
+            min-height: max(884px, 100dvh);
+            background-color: #10131b;
+            color: #e0e2ed;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+        }
+        .neon-glow-red { filter: drop-shadow(0 0 15px rgba(255, 0, 60, 0.5)); }
+        .neon-glow-blue { filter: drop-shadow(0 0 15px rgba(0, 162, 255, 0.5)); }
+        .neon-glow-yellow { filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.5)); }
+        .neon-glow-green { filter: drop-shadow(0 0 15px rgba(42, 229, 0, 0.5)); }
+        .neon-glow-primary { box-shadow: 0 0 20px rgba(173, 199, 255, 0.4); }
+        .neon-glow-red { box-shadow: 0 0 30px rgba(255, 0, 60, 0.6); }
+        .neon-glow-blue { box-shadow: 0 0 30px rgba(0, 162, 255, 0.6); }
+        .neon-glow-yellow { box-shadow: 0 0 30px rgba(255, 214, 0, 0.6); }
+        .neon-glow-green { box-shadow: 0 0 30px rgba(42, 229, 0, 0.6); }
+        .success-glow { animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(121, 255, 91, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(121, 255, 91, 0.8)); }
+        }
+        @keyframes pulse-glow-red {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(239, 68, 68, 0.8)); }
+        }
+        .error-glow { animation: pulse-glow-red 2s infinite; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .vignette-success {
+            background: radial-gradient(circle, transparent 40%, rgba(34, 197, 94, 0.2) 100%);
+        }
+        .vignette-error {
+            background: radial-gradient(circle, transparent 40%, rgba(239, 68, 68, 0.2) 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake-impact {
+            animation: shake 0.2s ease-in-out 0s 2;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body x-data="playerGame()" class="bg-background text-on-background min-h-screen flex flex-col items-center overflow-x-hidden selection:bg-primary-container selection:text-white">
+    <!-- Subtle Background Atmosphere -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none" x-show="clientState !== 'question_feedback'">
+        <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full"></div>
+        <div class="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-primary-container/10 blur-[150px] rounded-full"></div>
+    </div>
+
+    <!-- Top App Bar -->
+    <header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-xs" x-show="clientState !== 'question_feedback'">
+        <div class="flex items-center gap-sm">
+            <span class="material-symbols-outlined text-primary text-xl">grid_view</span>
+            <h1 class="font-display-mobile text-headline-sm text-primary tracking-tighter italic leading-none">QuizSpot</h1>
+        </div>
+        <div class="flex items-center gap-md">
+            <div class="bg-surface-container-high px-sm py-xs rounded-lg border border-outline-variant" x-show="gameState.pin">
+                <span class="text-xs font-label-bold text-outline">PIN: <span x-text="gameState.pin"></span></span>
+            </div>
+            <!-- Player Avatar via Background Sprite -->
+            <div class="w-8 h-8 rounded-full border-2 border-primary overflow-hidden bg-surface-container-highest shrink-0" 
+                 x-show="clientState !== 'join'">
+                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                     :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((selectedAvatar-1) % 4) * 33.33}% ${Math.floor((selectedAvatar-1) / 4) * 50}%;`"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main class="relative z-10 flex flex-col items-center justify-center w-full max-w-[480px] min-h-screen px-gutter-mobile pt-16 pb-20">
+
+        <!-- 1. JOIN VIEW -->
+        <div x-show="clientState === 'join'" class="w-full space-y-md flex flex-col items-center">
+            <!-- Animated Logo Section -->
+            <div class="flex flex-col items-center mb-sm text-center">
+                <div class="relative w-20 h-20 mb-sm">
+                    <div class="absolute inset-0 bg-primary/20 rounded-2xl rotate-45 animate-pulse"></div>
+                    <div class="absolute inset-2 glass-panel rounded-xl flex items-center justify-center z-10">
+                        <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+                    </div>
+                </div>
+                <h1 class="font-display-mobile text-display-mobile text-primary tracking-tighter italic">QuizSpot</h1>
+                <p class="font-body-md text-body-md text-outline-variant mt-xs">Local Real-time Arena</p>
+            </div>
+
+            <!-- PIN Input -->
+            <div class="w-full relative group">
+                <label class="absolute -top-3 left-4 px-2 bg-[#10131b] font-label-bold text-[10px] tracking-wider text-primary z-20">GAME PIN</label>
+                <input type="text" x-model="pin" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-4 font-headline-sm text-center text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary/10" placeholder="Enter Game PIN..."/>
+            </div>
+
+            <!-- Nickname Input -->
+            <div class="w-full relative group">
+                <label class="absolute -top-3 left-4 px-2 bg-[#10131b] font-label-bold text-[10px] tracking-wider text-primary z-20">NICKNAME</label>
+                <input type="text" x-model="nickname" maxlength="20" class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-4 font-headline-sm text-center text-on-surface focus:outline-none focus:border-primary-container focus:ring-4 focus:ring-primary/10" placeholder="Type your alias..."/>
+            </div>
+
+            <!-- Avatar Choice -->
+            <div class="w-full space-y-sm">
+                <p class="font-label-bold text-xs text-primary text-center uppercase tracking-wider">Choose your character</p>
+                <div class="flex gap-md overflow-x-auto pb-2 px-2 no-scrollbar snap-x justify-start border border-white/5 rounded-xl p-2 bg-surface-container-lowest/50">
+                    <template x-for="av in avatars" :key="av.id">
+                        <button @click="selectedAvatar = av.id" class="flex-none snap-center focus:outline-none">
+                            <div class="w-16 h-16 rounded-full border-2 transition-all duration-150 overflow-hidden bg-surface-container-highest shrink-0"
+                                 :class="selectedAvatar === av.id ? 'border-primary-container scale-105 neon-glow-blue shadow-lg' : 'border-outline-variant opacity-60 hover:opacity-100'">
+                                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                     :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((av.id-1) % 4) * 33.33}% ${Math.floor((av.id-1) / 4) * 50}%;`"></div>
+                             </div>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Error message -->
+            <div x-show="errorMessage" class="text-error font-label-bold text-center text-sm bg-error/10 border border-error/20 p-3 rounded-lg w-full" x-text="errorMessage"></div>
+
+            <!-- Join Action Button -->
+            <button @click="joinGame" :disabled="isJoining" class="w-full bg-primary-container text-on-primary-container font-headline-sm text-lg py-5 rounded-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-md group disabled:opacity-50 shadow-lg neon-glow-primary">
+                <span x-show="!isJoining">JOIN GAME</span>
+                <span x-show="isJoining" class="flex items-center gap-sm">
+                    <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
+                    <span>JOINING...</span>
+                </span>
+                <span x-show="!isJoining" class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-variation-settings: 'wght' 700;">arrow_forward</span>
+            </button>
+        </div>
+
+        <!-- 2. WAITING LOBBY -->
+        <div x-show="clientState === 'waiting_lobby'" class="w-full space-y-lg flex flex-col items-center text-center">
+            <!-- Avatar via Background Sprite -->
+            <div class="w-36 h-36 rounded-full border-4 border-primary-container overflow-hidden neon-glow-blue transition-all bg-surface-container-highest animate-bounce">
+                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                     :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((selectedAvatar-1) % 4) * 33.33}% ${Math.floor((selectedAvatar-1) / 4) * 50}%;`"></div>
+            </div>
+            <div class="space-y-xs">
+                <h2 class="font-display-mobile text-3xl text-secondary-fixed">Joined as <span class="text-white font-extrabold italic" x-text="nickname"></span></h2>
+                <p class="font-body-md text-outline">You are locked in! Check your name on the TV display.</p>
+            </div>
+            <div class="glass-panel p-md rounded-2xl w-full flex flex-col items-center gap-sm">
+                <span class="relative flex h-4 w-4">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-secondary-fixed"></span>
+                </span>
+                <span class="font-label-bold text-sm text-outline-variant">WAITING FOR THE HOST TO START...</span>
+            </div>
+        </div>
+
+        <!-- 3. QUESTION INTRO / COUNTDOWN -->
+        <div x-show="clientState === 'question_intro'" class="w-full flex flex-col items-center text-center space-y-md">
+            <div class="relative w-24 h-24 mb-sm">
+                <div class="absolute inset-0 bg-primary/20 rounded-2xl rotate-45 animate-spin duration-3000"></div>
+                <div class="absolute inset-2 glass-panel rounded-xl flex items-center justify-center z-10">
+                    <span class="material-symbols-outlined text-secondary-fixed text-5xl">timer</span>
+                </div>
+            </div>
+            <h2 class="font-display-mobile text-4xl text-on-surface">Get Ready!</h2>
+            <p class="font-body-lg text-outline">Look at the TV screen for the question.</p>
+        </div>
+
+        <!-- 4. KEYPAD / CONTROLLER -->
+        <div x-show="clientState === 'question_active'" class="w-full h-[70vh] flex flex-col gap-4">
+            <div class="flex justify-between items-center bg-surface-container/40 backdrop-blur-md p-3 rounded-xl border border-white/5 shrink-0">
+                <div class="flex flex-col">
+                    <span class="text-outline font-label-bold text-[10px] uppercase tracking-widest">Active Question</span>
+                    <span class="text-primary font-label-bold text-sm" x-text="`Question ${gameState.currentQuestionIndex + 1}/${gameState.totalQuestions}`"></span>
+                </div>
+                <div class="bg-surface-container-high px-3 py-1 rounded-full border border-white/10">
+                    <span class="font-headline-sm text-secondary-fixed text-base" x-text="`Time: ${gameState.timeRemaining}s`"></span>
+                </div>
+            </div>
+
+            <!-- Locked In Status Indicator -->
+            <div x-show="selectedOption !== null" class="bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-center animate-pulse shrink-0">
+                <p class="font-label-bold text-xs text-primary uppercase tracking-wider">Answer Locked In! Waiting for others...</p>
+            </div>
+            
+            <div class="flex-grow grid grid-cols-2 grid-rows-2 gap-4 pb-4">
+                <!-- Red Triangle -->
+                <button @click="submitAnswer(0)" :disabled="selectedOption !== null"
+                        class="group relative flex items-center justify-center rounded-2xl active:scale-95 transition-all duration-200 overflow-hidden shadow-2xl border-4"
+                        :class="[
+                            selectedOption === null ? 'bg-[#ff003c] border-[#ff003c]/50 neon-glow-red hover:scale-[1.02]' : 
+                            (selectedOption === 0 ? 'bg-[#ff003c] border-white neon-glow-red scale-105' : 'bg-[#ff003c]/10 border-transparent opacity-25 grayscale pointer-events-none')
+                        ]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                    <span class="material-symbols-outlined text-white text-[150px] md:text-[160px] transition-transform"
+                          :class="selectedOption === 0 ? 'scale-110' : 'group-active:scale-90'"
+                          style="font-variation-settings: 'FILL' 1;">change_history</span>
+                    <template x-if="selectedOption === 0">
+                        <div class="absolute top-3 right-3 bg-white text-[#ff003c] rounded-full p-0.5 shadow-lg flex items-center justify-center w-8 h-8">
+                            <span class="material-symbols-outlined text-xl font-bold">check</span>
+                        </div>
+                    </template>
+                </button>
+                
+                <!-- Blue Diamond -->
+                <button @click="submitAnswer(1)" :disabled="selectedOption !== null"
+                        class="group relative flex items-center justify-center rounded-2xl active:scale-95 transition-all duration-200 overflow-hidden shadow-2xl border-4"
+                        :class="[
+                            selectedOption === null ? 'bg-[#00a2ff] border-[#00a2ff]/50 neon-glow-blue hover:scale-[1.02]' : 
+                            (selectedOption === 1 ? 'bg-[#00a2ff] border-white neon-glow-blue scale-105' : 'bg-[#00a2ff]/10 border-transparent opacity-25 grayscale pointer-events-none')
+                        ]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                    <span class="material-symbols-outlined text-white text-[150px] md:text-[160px] transition-transform"
+                          :class="selectedOption === 1 ? 'scale-110' : 'group-active:scale-90'"
+                          style="font-variation-settings: 'FILL' 1;">diamond</span>
+                    <template x-if="selectedOption === 1">
+                        <div class="absolute top-3 right-3 bg-white text-[#00a2ff] rounded-full p-0.5 shadow-lg flex items-center justify-center w-8 h-8">
+                            <span class="material-symbols-outlined text-xl font-bold">check</span>
+                        </div>
+                    </template>
+                </button>
+                
+                <!-- Yellow Circle -->
+                <button @click="submitAnswer(2)" :disabled="selectedOption !== null"
+                        class="group relative flex items-center justify-center rounded-2xl active:scale-95 transition-all duration-200 overflow-hidden shadow-2xl border-4"
+                        :class="[
+                            selectedOption === null ? 'bg-[#ffd600] border-[#ffd600]/50 neon-glow-yellow hover:scale-[1.02]' : 
+                            (selectedOption === 2 ? 'bg-[#ffd600] border-white neon-glow-yellow scale-105' : 'bg-[#ffd600]/10 border-transparent opacity-25 grayscale pointer-events-none')
+                        ]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                    <span class="material-symbols-outlined text-white text-[150px] md:text-[160px] transition-transform"
+                          :class="selectedOption === 2 ? 'scale-110' : 'group-active:scale-90'"
+                          style="font-variation-settings: 'FILL' 1;">circle</span>
+                    <template x-if="selectedOption === 2">
+                        <div class="absolute top-3 right-3 bg-white text-[#ffd600] rounded-full p-0.5 shadow-lg flex items-center justify-center w-8 h-8">
+                            <span class="material-symbols-outlined text-xl font-bold">check</span>
+                        </div>
+                    </template>
+                </button>
+                
+                <!-- Green Square -->
+                <button @click="submitAnswer(3)" :disabled="selectedOption !== null"
+                        class="group relative flex items-center justify-center rounded-2xl active:scale-95 transition-all duration-200 overflow-hidden shadow-2xl border-4"
+                        :class="[
+                            selectedOption === null ? 'bg-[#2ae500] border-[#2ae500]/50 neon-glow-green hover:scale-[1.02]' : 
+                            (selectedOption === 3 ? 'bg-[#2ae500] border-white neon-glow-green scale-105' : 'bg-[#2ae500]/10 border-transparent opacity-25 grayscale pointer-events-none')
+                        ]">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                    <span class="material-symbols-outlined text-white text-[150px] md:text-[160px] transition-transform"
+                          :class="selectedOption === 3 ? 'scale-110' : 'group-active:scale-90'"
+                          style="font-variation-settings: 'FILL' 1;">square</span>
+                    <template x-if="selectedOption === 3">
+                        <div class="absolute top-3 right-3 bg-white text-[#2ae500] rounded-full p-0.5 shadow-lg flex items-center justify-center w-8 h-8">
+                            <span class="material-symbols-outlined text-xl font-bold">check</span>
+                        </div>
+                    </template>
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. ANSWER SUBMITTED / WAITING VIEW -->
+        <div x-show="clientState === 'answer_submitted'" class="w-full space-y-lg flex flex-col items-center text-center">
+            <div class="relative w-24 h-24 mb-sm animate-pulse-glow">
+                <div class="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+                <div class="relative w-24 h-24 rounded-full bg-surface-container-high border-2 border-primary flex items-center justify-center z-10">
+                    <span class="material-symbols-outlined text-primary text-5xl">check_circle</span>
+                </div>
+            </div>
+            <div class="space-y-xs">
+                <h2 class="font-display-mobile text-3xl text-on-surface">Answer Locked In!</h2>
+                <p class="font-body-md text-outline">Waiting for other players to answer or the timer to expire...</p>
+            </div>
+        </div>
+
+        <!-- 6. FEEDBACK VIEW -->
+        <div x-show="clientState === 'question_feedback'" class="fixed inset-0 z-40 w-screen h-screen flex flex-col items-center justify-center text-center px-gutter-mobile bg-[#10131b]">
+            
+            <!-- Vignette Effects -->
+            <div class="fixed inset-0 pointer-events-none" :class="lastAnswerCorrect ? 'vignette-success' : 'vignette-error'"></div>
+
+            <!-- Massive Feedback Content -->
+            <div class="z-10 flex flex-col items-center text-center px-gutter-mobile w-full">
+                <!-- Icon -->
+                <div class="mb-lg" :class="lastAnswerCorrect ? 'success-glow' : 'error-glow shake-impact'">
+                    <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-8 flex items-center justify-center animate-pulse"
+                         :class="lastAnswerCorrect ? 'border-secondary-fixed text-secondary-fixed' : 'border-error text-error'">
+                        <span class="material-symbols-outlined text-[80px] md:text-[120px]"
+                              x-text="lastAnswerCorrect ? 'check' : 'close'">
+                        </span>
+                    </div>
+                </div>
+
+                <!-- High Impact Headline -->
+                <h1 class="font-display-mobile text-[56px] tracking-tighter italic mb-xs drop-shadow-lg"
+                    :class="lastAnswerCorrect ? 'text-secondary-fixed' : 'text-error'"
+                    x-text="lastAnswerCorrect ? 'CORRECT!' : 'INCORRECT!'">
+                </h1>
+
+                <!-- Points Awarded Glass Card -->
+                <div class="glass-panel rounded-xl px-lg py-md mb-lg w-full max-w-[380px] shadow-2xl">
+                    <p class="font-label-bold text-label-bold text-outline-variant mb-xs uppercase tracking-widest">Points Gained</p>
+                    <p class="font-headline-sm text-headline-sm text-white font-bold"
+                       x-text="lastAnswerCorrect ? `+${scoreChange} Points` : 'Better luck next time!'">
+                    </p>
+                </div>
+
+                <!-- Total Score -->
+                <div class="flex flex-col items-center">
+                    <p class="font-label-bold text-label-bold text-white opacity-70 uppercase tracking-widest mb-1">
+                        Current Score
+                    </p>
+                    <p class="font-headline-md text-headline-md text-white font-extrabold" x-text="currentScore"></p>
+                </div>
+
+                <!-- Correct Answer Reveal (For Incorrect State) -->
+                <div class="mt-lg opacity-80" x-show="!lastAnswerCorrect">
+                    <p class="font-body-md text-body-md italic text-outline-variant">
+                        The correct answer was: <span class="font-bold text-secondary-fixed" x-text="gameState.currentQuestion && gameState.currentQuestion.correctIndex !== null ? gameState.currentQuestion.options[gameState.currentQuestion.correctIndex] : ''"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. GAME OVER / FINAL RESULTS VIEW -->
+        <div x-show="clientState === 'game_over'" class="w-full space-y-lg flex flex-col items-center text-center pt-8">
+            <div class="mb-md animate-float">
+                <div class="relative inline-block">
+                    <!-- Avatar via Background Sprite -->
+                    <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-primary p-1 bg-surface-container-high overflow-hidden neon-glow-primary bg-cover bg-no-repeat">
+                        <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                             :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((selectedAvatar-1) % 4) * 33.33}% ${Math.floor((selectedAvatar-1) / 4) * 50}%;`"></div>
+                    </div>
+                    <div class="absolute -bottom-2 -right-2 bg-secondary-fixed text-on-secondary px-4 py-1 rounded-full font-label-bold text-label-bold shadow-lg">
+                        YOU
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank Headline -->
+            <div class="space-y-xs mb-lg">
+                <p class="font-label-bold text-label-bold text-secondary-fixed uppercase tracking-widest">Victory Achieved</p>
+                <h2 class="font-display-mobile text-4xl text-on-background leading-tight">
+                    You finished <br>
+                    <span class="text-primary italic" x-text="`${rank()}${rankSuffix(rank())} Place!`"></span>
+                </h2>
+            </div>
+
+            <!-- Score Cards Bento Grid -->
+            <div class="glass-panel rounded-xl p-md flex flex-col items-center justify-center w-full max-w-[380px] shadow-lg">
+                <span class="material-symbols-outlined text-primary text-headline-sm mb-xs">stars</span>
+                <p class="font-label-bold text-label-bold text-outline-variant mb-xs">FINAL SCORE</p>
+                <h3 class="font-headline-lg text-headline-lg text-on-background font-black" x-text="currentScore"></h3>
+            </div>
+
+            <p class="font-body-md text-outline">Check the TV Screen for the final podium ceremony!</p>
+        </div>
+
+    </main>
+
+    <!-- Bottom Connection Indicator -->
+    <footer x-show="clientState !== 'join' && clientState !== 'question_feedback'" class="fixed bottom-0 left-0 w-full h-16 flex items-center justify-center bg-surface-container-lowest/80 backdrop-blur-2xl rounded-t-xl z-30 border-t border-white/5">
+        <div class="flex items-center gap-sm bg-surface-container-high px-4 py-1.5 rounded-full border border-white/5">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary-fixed"></span>
+            </span>
+            <p class="font-label-bold text-[10px] text-on-surface tracking-wider uppercase">CONNECTED: <span x-text="nickname"></span></p>
+        </div>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        function playerGame() {
+            return {
+                socket: null,
+                clientState: 'join',
+                pin: '',
+                nickname: '',
+                selectedAvatar: 1,
+                gameState: {},
+                lastAnswerCorrect: false,
+                scoreChange: 0,
+                currentScore: 0,
+                selectedOption: null,
+                errorMessage: '',
+                isJoining: false,
+                avatars: [
+                    { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 },
+                    { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 },
+                    { id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }
+                ],
+                init() {
+                    this.socket = io();
+
+                    this.socket.on('game-state', (state) => {
+                        this.gameState = state;
+
+                        if (state.state === 'LOBBY') {
+                            if (this.clientState !== 'join' && this.clientState !== 'waiting_lobby') {
+                                this.clientState = 'join';
+                                this.selectedOption = null;
+                            }
+                        } else if (state.state === 'QUESTION_INTRO') {
+                            if (this.clientState === 'waiting_lobby' || this.clientState === 'question_feedback' || this.clientState === 'join') {
+                                this.clientState = 'question_intro';
+                                this.selectedOption = null;
+                            }
+                        } else if (state.state === 'QUESTION_ACTIVE') {
+                            if (this.selectedOption === null) {
+                                this.clientState = 'question_active';
+                            }
+                        } else if (state.state === 'QUESTION_LEADERBOARD') {
+                            const me = state.players.find(p => p.id === this.socket.id);
+                            if (me) {
+                                this.lastAnswerCorrect = me.lastAnswerCorrect;
+                                this.scoreChange = me.scoreChange;
+                                this.currentScore = me.score;
+                            }
+                            this.clientState = 'question_feedback';
+                        } else if (state.state === 'GAME_OVER') {
+                            const me = state.players.find(p => p.id === this.socket.id);
+                            if (me) {
+                                this.currentScore = me.score;
+                            }
+                            this.clientState = 'game_over';
+                        }
+                    });
+
+                    this.socket.on('timer-tick', (time) => {
+                        this.gameState.timeRemaining = time;
+                    });
+
+                    this.socket.on('join-success', ({ name, avatar }) => {
+                        this.isJoining = false;
+                        this.clientState = 'waiting_lobby';
+                        this.errorMessage = '';
+                    });
+
+                    this.socket.on('join-error', (msg) => {
+                        this.isJoining = false;
+                        this.errorMessage = msg;
+                    });
+
+                    this.socket.on('answer-accepted', () => {
+                        // Stay on question_active — the locked-in visual handles the waiting state.
+                        // Feedback is only revealed when the server transitions to QUESTION_LEADERBOARD
+                        // (i.e. all players answered or the timer expired).
+                    });
+
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.has('pin')) {
+                        this.pin = params.get('pin');
+                    }
+                },
+                joinGame() {
+                    if (!this.pin.trim()) {
+                        this.errorMessage = 'Please enter the Game PIN.';
+                        return;
+                    }
+                    if (!this.nickname.trim()) {
+                        this.errorMessage = 'Please enter a nickname.';
+                        return;
+                    }
+                    this.isJoining = true;
+                    this.socket.emit('join-game', {
+                        pin: this.pin.replace(/\s+/g, ''),
+                        name: this.nickname.trim(),
+                        avatar: this.selectedAvatar
+                    });
+                },
+                submitAnswer(idx) {
+                    if (this.clientState !== 'question_active') return;
+                    this.selectedOption = idx;
+                    this.socket.emit('submit-answer', idx);
+                },
+                rank() {
+                    if (!this.gameState.leaderboard) return 0;
+                    return this.gameState.leaderboard.findIndex(p => p.id === this.socket.id) + 1;
+                },
+                rankSuffix(r) {
+                    return r === 1 ? 'st' : r === 2 ? 'nd' : r === 3 ? 'rd' : 'th';
+                }
+            };
+        }
+    </script>
+</body>
+</html>

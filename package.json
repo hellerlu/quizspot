@@ -1,0 +1,25 @@
+{
+  "name": "quizspot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "build-css": "tailwindcss -i src/input.css -o public/assets/style.css --minify",
+    "watch-css": "tailwindcss -i src/input.css -o public/assets/style.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "@tailwindcss/forms": "^0.5.11",
+    "autoprefixer": "^10.5.0",
+    "tailwindcss": "^4.3.0"
+  }
+}

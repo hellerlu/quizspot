@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1780848709822,
+    "question": "New Trivia Question",
+    "options": [
+      "Option A",
+      "Option B",
+      "Option C",
+      "Option D"
+    ],
+    "correctIndex": 0,
+    "timeLimit": 20,
+    "image": ""
+  }
+]

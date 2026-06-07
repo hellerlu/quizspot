@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>QuizSpot | Widescreen Cast View</title>
+    <!-- Compiled Tailwind stylesheet -->
+    <link href="/assets/style.css" rel="stylesheet"/>
+    <!-- Local Google Fonts & Icons -->
+    <link href="/assets/fonts/fonts.css" rel="stylesheet"/>
+    <link href="/assets/fonts/icons.css" rel="stylesheet"/>
+    <!-- Socket.io, Alpine.js, and Qrious QR library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/assets/libs/qrious.min.js"></script>
+    <script defer src="/assets/libs/alpine.min.js"></script>
+    <style>
+        body {
+            background-color: #10131b;
+            color: #e0e2ed;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-grid {
+            background-size: 100px 100px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .neon-glow-secondary {
+            box-shadow: 0 0 20px rgba(121, 255, 91, 0.3);
+        }
+        .neon-glow-gold {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        .neon-glow-silver {
+            box-shadow: 0 0 25px rgba(192, 192, 192, 0.4);
+            border: 1px solid rgba(192, 192, 192, 0.3);
+        }
+        .neon-glow-bronze {
+            box-shadow: 0 0 20px rgba(205, 127, 50, 0.3);
+            border: 1px solid rgba(205, 127, 50, 0.2);
+        }
+        .timer-glow {
+            filter: drop-shadow(0 0 10px var(--timer-color, #79ff5b));
+        }
+        .bar-glow {
+            filter: drop-shadow(0 0 15px currentColor);
+        }
+        .confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes notifyPulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(121, 255, 91, 0.25), 0 0 0 1px rgba(121,255,91,0.2); }
+            50%  { box-shadow: 0 0 45px rgba(121, 255, 91, 0.55), 0 0 0 1px rgba(121,255,91,0.4); }
+        }
+        .notification-card {
+            animation: notifyPulseGlow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body x-data="tvBroadcast()" class="bg-background text-on-surface select-none font-body-md overflow-hidden neon-grid">
+    <canvas class="confetti-canvas" id="confetti" x-show="gameState.state === 'GAME_OVER'"></canvas>
+
+    <!-- Background Atmospheric Glows -->
+    <div class="fixed top-0 -left-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+    <div class="fixed bottom-0 -right-20 w-[600px] h-[600px] bg-secondary-fixed/5 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+
+    <!-- Top Navigation Bar (Shared Header) -->
+    <header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-lg py-sm">
+        <div class="flex items-center gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 0;">grid_view</span>
+            <h1 class="font-display-tv text-headline-sm text-primary tracking-tighter italic leading-none">QuizSpot</h1>
+        </div>
+        
+        <div class="flex items-center gap-lg">
+            <!-- Game PIN Indicator -->
+            <div class="flex flex-col items-end">
+                <span class="font-label-bold text-label-bold text-outline">PIN CODE</span>
+                <span class="font-headline-sm text-secondary-fixed tracking-widest" x-text="gameState.pin || '------'"></span>
+            </div>
+
+            <!-- Dynamic circular timer (Visible only during active questions) -->
+            <div class="relative w-14 h-14 rounded-full flex items-center justify-center" x-show="gameState.state === 'QUESTION_ACTIVE'">
+                <svg class="absolute inset-0 w-full h-full -rotate-90">
+                    <circle class="text-white/10" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-width="4"></circle>
+                    <circle class="timer-glow transition-all duration-1000" cx="28" cy="28" fill="transparent" r="24" stroke="currentColor" stroke-linecap="round" stroke-width="4"
+                            :class="gameState.timeRemaining <= 5 ? 'text-error' : 'text-secondary-fixed'"
+                            :style="`stroke-dasharray: 150.8; stroke-dashoffset: ${150.8 - (150.8 * (gameState.timeRemaining / activeQuestionDuration()))}; --timer-color: ${gameState.timeRemaining <= 5 ? '#ffb4ab' : '#79ff5b'}`"></circle>
+                </svg>
+                <div class="text-center z-10">
+                    <span class="font-display-tv text-label-bold text-lg" :class="gameState.timeRemaining <= 5 ? 'text-error' : 'text-secondary-fixed'" x-text="gameState.timeRemaining"></span>
+                </div>
+            </div>
+
+            <!-- Host Icon (Background Sprite) -->
+            <div class="rounded-full border-2 border-primary/30 w-10 h-10 overflow-hidden shrink-0 bg-surface-container-highest">
+                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat" 
+                     style="background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: 33.33% 50%;"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main TV Content Area -->
+    <main class="h-screen w-full flex flex-col justify-center px-safe-area-tv pt-24 pb-24">
+
+        <!-- 1. LOBBY VIEW -->
+        <div x-show="gameState.state === 'LOBBY'" class="flex-grow flex flex-col justify-around">
+            <div class="grid grid-cols-12 gap-lg items-center mt-4">
+                <!-- Left Side: Instructions & QR Info -->
+                <div class="col-span-5 flex flex-col gap-lg items-start">
+                    <div class="space-y-sm">
+                        <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight leading-tight">Waiting for Players...</h2>
+                        <p class="font-body-lg text-body-lg text-outline-variant max-w-[480px]">Join the game to test your knowledge against friends in real-time!</p>
+                    </div>
+                    <div class="glass-panel p-md rounded-xl flex flex-col gap-md w-full">
+                        <div class="flex items-center gap-md text-secondary-fixed">
+                            <span class="material-symbols-outlined text-4xl">link</span>
+                            <span class="font-headline-sm text-headline-sm" x-text="`Join at: ${gameState.hostIP}:${gameState.hostPort}`"></span>
+                        </div>
+                        <div class="h-px bg-white/10 w-full"></div>
+                        <div class="flex items-center gap-md text-primary">
+                            <span class="material-symbols-outlined text-4xl">qr_code_2</span>
+                            <span class="font-headline-sm text-headline-sm">Scan to connect instantly</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle: Rotating QR Code -->
+                <div class="col-span-4 flex justify-center">
+                    <div class="relative animate-float">
+                        <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
+                        <div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
+                            <canvas id="lobby-qr" class="w-64 h-64 md:w-80 md:h-80"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Stats Card -->
+                <div class="col-span-3 flex flex-col gap-md">
+                    <div class="glass-panel p-lg rounded-2xl flex flex-col items-center justify-center text-center gap-xs">
+                        <span class="text-label-bold font-label-bold text-outline-variant uppercase tracking-widest">Players Joined</span>
+                        <span class="font-display-tv text-display-tv text-secondary-fixed" x-text="gameState.players ? gameState.players.length : 0"></span>
+                    </div>
+                    <div class="glass-panel p-md rounded-xl flex items-center gap-md">
+                        <span class="material-symbols-outlined text-primary text-3xl">sports_esports</span>
+                        <div class="flex flex-col">
+                            <span class="font-label-bold text-outline">Category</span>
+                            <span class="font-headline-sm text-headline-sm" x-text="gameState.quizName || 'General Trivia'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Lobby Chips â€” Dynamic flex-wrap so cards size to name length -->
+            <div class="mt-8 overflow-y-auto px-4 -mx-4 py-4 -my-4 no-scrollbar">
+                <div class="flex items-center justify-between mb-sm border-b border-white/5 pb-2 px-1">
+                    <h3 class="font-headline-sm text-headline-sm text-outline">Player Lobby</h3>
+                    <div class="flex gap-xs items-center text-secondary-fixed">
+                        <span class="w-3 h-3 bg-secondary-fixed rounded-full animate-pulse"></span>
+                        <span class="font-label-bold">Live</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-sm">
+                    <template x-for="(p, index) in gameState.players" :key="p.id">
+                        <div class="group flex items-center bg-surface-container-highest p-1 gap-2 pr-3 rounded-full border border-white/5 transition-all cursor-default shrink-0"
+                             :class="index % 4 === 0 ? 'neon-glow-primary hover:border-primary/50' : (index % 4 === 1 ? 'neon-glow-secondary hover:border-secondary-fixed/50' : (index % 4 === 2 ? 'hover:border-tertiary/50' : 'hover:border-primary-fixed-dim/50'))">
+                            <!-- Avatar via Background Sprite (scale wrapped to crop white corners) -->
+                            <div class="w-9 h-9 rounded-full border border-white/10 overflow-hidden shrink-0 bg-surface-container-highest">
+                                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat" 
+                                     :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
+                            </div>
+                            <span class="font-headline-sm text-sm font-bold whitespace-nowrap leading-none"
+                                  :class="index % 4 === 0 ? 'text-primary' : (index % 4 === 1 ? 'text-secondary-fixed' : (index % 4 === 2 ? 'text-tertiary' : 'text-primary-fixed-dim'))"
+                                  x-text="p.name"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. QUESTION INTRO VIEW -->
+        <div x-show="gameState.state === 'QUESTION_INTRO'" class="flex-grow flex flex-col justify-center items-center text-center space-y-md">
+            <span class="px-md py-xs rounded-lg glass-panel text-primary font-label-bold uppercase tracking-widest text-xs"
+                  x-text="`Question ${gameState.currentQuestionIndex + 1} of ${gameState.totalQuestions}`"></span>
+            
+            <h2 class="font-display-tv text-headline-lg text-on-surface max-w-5xl mx-auto leading-tight italic"
+                x-text="gameState.currentQuestion ? gameState.currentQuestion.question : ''"></h2>
+
+            <div class="pt-lg flex flex-col items-center gap-sm">
+                <div class="relative w-24 h-24 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20">
+                    <span class="material-symbols-outlined text-primary text-5xl animate-bounce">sports_esports</span>
+                </div>
+                <p class="font-label-bold text-secondary-fixed text-lg animate-pulse">GET READY TO ANSWER ON YOUR CONTROLLER!</p>
+            </div>
+        </div>
+
+        <!-- 3. QUESTION ACTIVE VIEW -->
+        <div x-show="gameState.state === 'QUESTION_ACTIVE'" class="flex-grow flex flex-col justify-start items-center pt-4 pb-4">
+            <!-- Question text -->
+            <section class="w-full text-center mb-sm">
+                <div class="inline-block px-md py-xs mb-xs rounded-lg glass-panel text-primary font-label-bold uppercase tracking-widest text-xs"
+                      x-text="`Question ${gameState.currentQuestionIndex + 1} of ${gameState.totalQuestions}`"></div>
+                <h2 class="font-display-tv text-on-surface max-w-5xl mx-auto leading-tight transition-all duration-300"
+                    :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-lg-mobile lg:text-[28px]' : 'text-headline-lg-mobile lg:text-headline-lg'"
+                    x-text="gameState.currentQuestion ? gameState.currentQuestion.question : ''"></h2>
+            </section>
+
+            <!-- Central visual / Image (only shown when a question has an image) -->
+            <template x-if="gameState.currentQuestion && gameState.currentQuestion.image">
+                <section class="w-full max-w-4xl px-md mb-md flex-grow flex items-center justify-center">
+                    <div class="w-full max-w-3xl aspect-video rounded-2xl overflow-hidden border-2 border-primary/20 neon-glow-primary bg-surface-container-low/50 relative flex items-center justify-center">
+                        <img :src="gameState.currentQuestion.image" class="w-full h-full object-contain">
+                    </div>
+                </section>
+            </template>
+
+            <!-- Options Grid (2x2) -->
+            <section class="grid grid-cols-2 gap-sm w-full max-w-7xl h-1/4">
+                <!-- Option 0: Red Triangle -->
+                <div class="relative group transition-all duration-200">
+                    <div class="absolute inset-0 bg-[#ff003c] rounded-xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#ff003c]">
+                        <span class="material-symbols-outlined text-headline-sm text-[#ff003c] mr-sm" style="font-variation-settings: 'FILL' 1;">change_history</span>
+                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[0] : ''"></span>
+                    </div>
+                </div>
+                <!-- Option 1: Blue Diamond -->
+                <div class="relative group transition-all duration-200">
+                    <div class="absolute inset-0 bg-[#00a2ff] rounded-xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#00a2ff]">
+                        <span class="material-symbols-outlined text-headline-sm text-[#00a2ff] mr-sm" style="font-variation-settings: 'FILL' 1;">diamond</span>
+                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[1] : ''"></span>
+                    </div>
+                </div>
+                <!-- Option 2: Yellow Circle -->
+                <div class="relative group transition-all duration-200">
+                    <div class="absolute inset-0 bg-[#ffd600] rounded-xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#ffd600]">
+                        <span class="material-symbols-outlined text-headline-sm text-[#ffd600] mr-sm" style="font-variation-settings: 'FILL' 1;">circle</span>
+                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[2] : ''"></span>
+                    </div>
+                </div>
+                <!-- Option 3: Green Square -->
+                <div class="relative group transition-all duration-200">
+                    <div class="absolute inset-0 bg-[#2ae500] rounded-xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#2ae500]">
+                        <span class="material-symbols-outlined text-headline-sm text-[#2ae500] mr-sm" style="font-variation-settings: 'FILL' 1;">square</span>
+                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[3] : ''"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Answers Received indicator -->
+            <div class="w-full max-w-7xl mt-md flex justify-between items-center">
+                <div class="flex flex-col gap-xs max-w-[320px] w-full">
+                    <div class="flex justify-between items-center">
+                        <span class="font-label-bold text-xs text-outline uppercase tracking-wider">Answers Received</span>
+                        <span class="font-label-bold text-sm text-primary">
+                            <span x-text="answeredCount()"></span>
+                            <span class="text-on-surface-variant font-body-md text-xs" x-text="` / ${gameState.players ? gameState.players.length : 0}`"></span>
+                        </span>
+                    </div>
+                    <div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                        <div class="bg-primary h-full transition-all duration-500 shadow-[0_0_8px_rgba(173,199,255,0.8)]"
+                             :style="`width: ${gameState.players && gameState.players.length > 0 ? (answeredCount() / gameState.players.length * 100) : 0}%`"></div>
+                    </div>
+                </div>
+                <!-- Avatar Stack (Background Sprite) -->
+                <div class="flex gap-md">
+                    <div class="flex -space-x-4">
+                        <template x-for="(p, index) in gameState.players ? gameState.players.slice(0, 5) : []">
+                            <div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden shrink-0 bg-surface-container-highest">
+                                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                     :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
+                            </div>
+                        </template>
+                        <div class="w-10 h-10 rounded-full bg-surface-container-highest border-2 border-background flex items-center justify-center font-label-bold text-[10px] text-on-surface"
+                             x-show="gameState.players && gameState.players.length > 5"
+                             x-text="gameState.players && gameState.players.length > 5 ? '+' + (gameState.players.length - 5) : ''">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. QUESTION LEADERBOARD / SCOREBOARD VIEW -->
+        <div x-show="gameState.state === 'QUESTION_LEADERBOARD'" class="flex-grow flex flex-col justify-around">
+            <div class="grid grid-cols-12 gap-lg mt-4 items-center flex-grow">
+                
+                <!-- Left 8 columns: Leaderboard scores -->
+                <div class="col-span-8 flex flex-col gap-sm">
+                    <div class="mb-lg flex items-end justify-between border-l-4 border-primary pl-md">
+                        <div>
+                            <h2 class="font-display-tv text-headline-lg text-on-surface uppercase tracking-tight">TOP SCORES</h2>
+                            <p class="font-body-lg text-outline-variant">The competition is heating up!</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-sm">
+                        <template x-for="(p, index) in gameState.leaderboard ? gameState.leaderboard.slice(0, 5) : []" :key="p.id">
+                            <div class="group relative flex items-center h-20 w-full">
+                                <div class="w-64 font-headline-sm text-on-surface pr-md truncate flex items-center gap-sm">
+                                    <!-- Avatar via Background Sprite -->
+                                    <div class="w-10 h-10 rounded-full border border-white/10 overflow-hidden shrink-0 bg-surface-container-highest">
+                                        <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                             :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
+                                    </div>
+                                    <span x-text="p.name"></span>
+                                </div>
+                                <div class="flex-1 h-full relative flex items-center pl-10">
+                                    <!-- Rank Badge (positioned at the left edge of the bar area) -->
+                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center shadow-xl z-10 border-4 border-background"
+                                         :class="index === 0 ? 'bg-secondary-fixed text-on-secondary' : (index === 1 ? 'bg-primary text-on-primary' : (index === 2 ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-surface-container-highest text-on-surface'))">
+                                        <span class="font-label-bold" x-text="index + 1"></span>
+                                    </div>
+                                    <!-- Bar animation (only shown when score > 0) -->
+                                    <div class="h-12 bar-glow flex items-center justify-end pr-md rounded-r-xl transition-all duration-1000 overflow-hidden"
+                                         x-show="p.score > 0"
+                                         :class="index === 0 ? 'bg-secondary-fixed text-on-secondary' : (index === 1 ? 'bg-primary text-on-primary' : (index === 2 ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-surface-container-highest text-on-surface'))"
+                                         :style="`width: ${maxScore() > 0 ? (p.score / maxScore() * 95) : 0}%`">
+                                        <span class="font-display-tv text-headline-md tracking-tighter" x-text="p.score"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Right 4 columns: Selection Stats Bar Chart -->
+                <div class="col-span-4 glass-panel p-md rounded-2xl h-full flex flex-col justify-between select-none">
+                    <div class="text-center shrink-0">
+                        <span class="text-[10px] font-label-bold text-outline uppercase tracking-wider">Answer Distribution</span>
+                        <!-- Correct option display -->
+                        <div class="mt-sm p-sm rounded-lg border flex items-center gap-sm justify-center"
+                             :class="correctOptionColor().bgClass">
+                            <span class="material-symbols-outlined text-white" x-text="correctOptionColor().icon"></span>
+                            <span class="font-label-bold text-white text-xs" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[gameState.currentQuestion.correctIndex] : ''"></span>
+                        </div>
+                    </div>
+
+                    <!-- Visual selection bars -->
+                    <div class="flex items-end justify-around h-48 px-sm pt-md">
+                        <!-- Option 0: Red -->
+                        <div class="flex flex-col items-center gap-xs w-8 h-full justify-end">
+                            <span class="text-xs font-label-bold text-[#ff003c]" x-text="getOptionCount(0)"></span>
+                            <div class="w-full bg-[#ff003c] rounded-t transition-all duration-1000 shadow-lg"
+                                 :style="`height: ${maxSelectCount() > 0 ? (getOptionCount(0) / maxSelectCount() * 80) : 0}%`"></div>
+                            <span class="material-symbols-outlined text-[#ff003c] text-sm" style="font-variation-settings: 'FILL' 1;">change_history</span>
+                        </div>
+                        <!-- Option 1: Blue -->
+                        <div class="flex flex-col items-center gap-xs w-8 h-full justify-end">
+                            <span class="text-xs font-label-bold text-[#00a2ff]" x-text="getOptionCount(1)"></span>
+                            <div class="w-full bg-[#00a2ff] rounded-t transition-all duration-1000 shadow-lg"
+                                 :style="`height: ${maxSelectCount() > 0 ? (getOptionCount(1) / maxSelectCount() * 80) : 0}%`"></div>
+                            <span class="material-symbols-outlined text-[#00a2ff] text-sm" style="font-variation-settings: 'FILL' 1;">diamond</span>
+                        </div>
+                        <!-- Option 2: Yellow -->
+                        <div class="flex flex-col items-center gap-xs w-8 h-full justify-end">
+                            <span class="text-xs font-label-bold text-[#ffd600]" x-text="getOptionCount(2)"></span>
+                            <div class="w-full bg-[#ffd600] rounded-t transition-all duration-1000 shadow-lg"
+                                 :style="`height: ${maxSelectCount() > 0 ? (getOptionCount(2) / maxSelectCount() * 80) : 0}%`"></div>
+                            <span class="material-symbols-outlined text-[#ffd600] text-sm" style="font-variation-settings: 'FILL' 1;">circle</span>
+                        </div>
+                        <!-- Option 3: Green -->
+                        <div class="flex flex-col items-center gap-xs w-8 h-full justify-end">
+                            <span class="text-xs font-label-bold text-[#2ae500]" x-text="getOptionCount(3)"></span>
+                            <div class="w-full bg-[#2ae500] rounded-t transition-all duration-1000 shadow-lg"
+                                 :style="`height: ${maxSelectCount() > 0 ? (getOptionCount(3) / maxSelectCount() * 80) : 0}%`"></div>
+                            <span class="material-symbols-outlined text-[#2ae500] text-sm" style="font-variation-settings: 'FILL' 1;">square</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. GAME OVER / FINAL PODIUM VIEW -->
+        <div x-show="gameState.state === 'GAME_OVER'" class="flex-grow flex flex-col justify-end items-center pb-2 select-none">
+            <!-- Victory Title -->
+            <div class="absolute top-28 text-center animate-float">
+                <h2 class="font-display-tv text-headline-sm lg:text-headline-lg text-primary uppercase tracking-widest drop-shadow-[0_0_30px_rgba(173,199,255,0.6)]">
+                    The Champions
+                </h2>
+                <p class="font-body-lg text-on-surface-variant opacity-80 mt-xs">Final Standings Podium</p>
+            </div>
+
+            <!-- Podium Standings -->
+            <div class="flex items-end justify-center w-full max-w-5xl gap-md h-[48%]">
+                <!-- 2nd Place: Silver -->
+                <template x-if="gameState.leaderboard && gameState.leaderboard.length > 1">
+                    <div class="flex flex-col items-center w-1/3 group">
+                        <div class="relative mb-sm text-center">
+                            <!-- Avatar via Background Sprite -->
+                             <div class="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-slate-300 mx-auto overflow-hidden neon-glow-silver bg-surface-container-highest">
+                                 <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                      :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((gameState.leaderboard[1].avatar-1) % 4) * 33.33}% ${Math.floor((gameState.leaderboard[1].avatar-1) / 4) * 50}%;`"></div>
+                             </div>
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-300 text-black font-display-tv text-xs px-3 py-0.5 rounded-full italic font-bold">2ND</div>
+                            <h3 class="font-headline-sm text-base text-on-surface truncate w-40" x-text="gameState.leaderboard[1].name"></h3>
+                            <p class="font-display-tv text-headline-sm text-secondary-fixed text-base" x-text="gameState.leaderboard[1].score"></p>
+                        </div>
+                        <div class="w-full h-32 glass-panel rounded-t-xl neon-glow-silver flex items-center justify-center border-b-0">
+                            <span class="font-display-tv text-headline-sm text-slate-300/20">SILVER</span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 1st Place: Gold -->
+                <template x-if="gameState.leaderboard && gameState.leaderboard.length > 0">
+                    <div class="flex flex-col items-center w-1/3 group z-20">
+                        <div class="relative mb-sm text-center">
+                            <!-- Crown Icon -->
+                            <span class="material-symbols-outlined text-yellow-400 absolute -top-8 left-1/2 -translate-x-1/2 text-3xl animate-bounce" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                            <!-- Avatar via Background Sprite -->
+                             <div class="w-24 h-24 md:w-36 md:h-36 rounded-full border-8 border-yellow-400 mx-auto overflow-hidden neon-glow-gold bg-surface-container-highest relative">
+                                 <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                      :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((gameState.leaderboard[0].avatar-1) % 4) * 33.33}% ${Math.floor((gameState.leaderboard[0].avatar-1) / 4) * 50}%;`"></div>
+                             </div>
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-display-tv text-sm px-4 py-0.5 rounded-full italic font-extrabold shadow-lg">WINNER</div>
+                            <h3 class="font-display-tv text-headline-sm text-yellow-400 text-lg truncate w-44" x-text="gameState.leaderboard[0].name"></h3>
+                            <p class="font-display-tv text-headline-md text-secondary-fixed text-xl drop-shadow" x-text="gameState.leaderboard[0].score"></p>
+                        </div>
+                        <div class="w-full h-48 glass-panel rounded-t-xl neon-glow-gold flex items-center justify-center relative border-b-0">
+                            <div class="absolute inset-0 bg-gradient-to-t from-yellow-400/10 to-transparent pointer-events-none"></div>
+                            <span class="font-display-tv text-headline-sm text-yellow-400/30">GOLD</span>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 3rd Place: Bronze -->
+                <template x-if="gameState.leaderboard && gameState.leaderboard.length > 2">
+                    <div class="flex flex-col items-center w-1/3 group">
+                        <div class="relative mb-sm text-center">
+                            <!-- Avatar via Background Sprite -->
+                             <div class="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-amber-700 mx-auto overflow-hidden neon-glow-bronze bg-surface-container-highest">
+                                 <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                      :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((gameState.leaderboard[2].avatar-1) % 4) * 33.33}% ${Math.floor((gameState.leaderboard[2].avatar-1) / 4) * 50}%;`"></div>
+                             </div>
+                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-700 text-white font-display-tv text-xs px-3 py-0.5 rounded-full italic font-bold">3RD</div>
+                            <h3 class="font-headline-sm text-base text-on-surface truncate w-40" x-text="gameState.leaderboard[2].name"></h3>
+                            <p class="font-display-tv text-headline-sm text-secondary-fixed text-base" x-text="gameState.leaderboard[2].score"></p>
+                        </div>
+                        <div class="w-full h-24 glass-panel rounded-t-xl neon-glow-bronze flex items-center justify-center border-b-0">
+                            <span class="font-display-tv text-headline-sm text-amber-700/20">BRONZE</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Ranks 4–10 -->
+            <template x-if="gameState.leaderboard && gameState.leaderboard.length > 3">
+                <div class="w-full max-w-5xl mt-4 px-md">
+                    <div class="flex items-center justify-center gap-xs flex-wrap">
+                        <template x-for="(p, i) in gameState.leaderboard.slice(3, 10)" :key="p.id">
+                            <div class="flex items-center gap-sm glass-panel px-sm py-xs rounded-xl shrink-0 border border-white/5">
+                                <!-- Rank badge -->
+                                <span class="font-display-tv text-[11px] text-outline-variant w-8 text-center shrink-0 uppercase tracking-wide" x-text="rankLabel(i + 4)"></span>
+                                <!-- Avatar -->
+                                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-surface-container-highest border border-white/10">
+                                    <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                         :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
+                                </div>
+                                <!-- Name -->
+                                <span class="font-headline-sm text-sm text-on-surface max-w-[120px] truncate" x-text="p.name"></span>
+                                <!-- Score -->
+                                <span class="font-display-tv text-sm text-primary ml-xs shrink-0" x-text="p.score"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+    </main>
+
+    <!-- Footer Information Bar (Shared) -->
+    <footer class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-2xl h-20 flex items-center justify-between px-lg border-t border-white/5">
+        <div class="flex gap-lg items-center">
+            <div class="flex items-center gap-sm">
+                <span class="w-2.5 h-2.5 bg-secondary-fixed rounded-full bar-glow"></span>
+                <span class="font-label-bold uppercase text-[10px] tracking-widest text-outline-variant"
+                      x-text="`${gameState.players ? gameState.players.length : 0} Players Connected`"></span>
+            </div>
+            <div class="flex items-center gap-sm" x-show="gameState.state !== 'LOBBY' && gameState.state !== 'GAME_OVER'">
+                <span class="w-2.5 h-2.5 bg-primary rounded-full animate-pulse"></span>
+                <span class="font-label-bold uppercase text-[10px] tracking-widest text-outline-variant"
+                      x-text="`Question ${gameState.currentQuestionIndex + 1} / ${gameState.totalQuestions}`"></span>
+            </div>
+        </div>
+        <div class="flex gap-sm">
+            <div class="glass-panel px-md py-2 rounded-lg flex items-center gap-sm">
+                <span class="material-symbols-outlined text-primary text-sm">wifi</span>
+                <span class="font-label-bold text-[10px]" x-text="`CONNECT TO: http://${gameState.hostIP}:${gameState.hostPort}`"></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- New Player Join Notification Panel -->
+    <div x-show="newPlayerNotification !== null"
+         x-transition:enter="transition ease-out duration-500"
+         x-transition:enter-start="opacity-0 translate-x-8"
+         x-transition:enter-end="opacity-100 translate-x-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 translate-x-0"
+         x-transition:leave-end="opacity-0 translate-x-8"
+         class="notification-card fixed right-8 top-28 z-[100] glass-panel rounded-2xl px-lg py-md flex flex-col items-center gap-sm w-64 border border-secondary-fixed/40"
+         style="display: none;">
+        <!-- Live indicator badge -->
+        <div class="flex items-center gap-xs">
+            <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-fixed opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-secondary-fixed"></span>
+            </span>
+            <span class="font-label-bold text-[9px] text-secondary-fixed uppercase tracking-widest">Player Joined!</span>
+        </div>
+        <!-- Player Avatar -->
+        <div class="w-20 h-20 rounded-full border-4 border-secondary-fixed overflow-hidden bg-surface-container-highest mt-xs">
+            <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                 :style="newPlayerNotification ? `background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((newPlayerNotification.avatar-1) % 4) * 33.33}% ${Math.floor((newPlayerNotification.avatar-1) / 4) * 50}%;` : ''"></div>
+        </div>
+        <!-- Name (full, no truncation) -->
+        <div class="text-center px-sm">
+            <p class="font-headline-sm text-lg text-on-surface font-extrabold leading-tight break-words" x-text="newPlayerNotification ? newPlayerNotification.name : ''"></p>
+            <p class="font-label-bold text-[10px] text-secondary-fixed/70 mt-1 uppercase tracking-wider">has entered the arena!</p>
+        </div>
+    </div>
+
+    <!-- Interactive Script -->
+    <script>
+        function tvBroadcast() {
+            return {
+                socket: null,
+                gameState: {},
+                newPlayerNotification: null,
+                prevPlayerIds: [],
+                notificationTimer: null,
+                avatars: [
+                    { id: 1, class: 'scale-[3.5] translate-x-[-33%] translate-y-[-33%]' },
+                    { id: 2, class: 'scale-[3.5] translate-x-[-11%] translate-y-[-33%]' },
+                    { id: 3, class: 'scale-[3.5] translate-x-[11%] translate-y-[-33%]' },
+                    { id: 4, class: 'scale-[3.5] translate-x-[33%] translate-y-[-33%]' },
+                    { id: 5, class: 'scale-[3.5] translate-x-[-33%] translate-y-[-11%]' },
+                    { id: 6, class: 'scale-[3.5] translate-x-[-11%] translate-y-[-11%]' },
+                    { id: 7, class: 'scale-[3.5] translate-x-[11%] translate-y-[-11%]' },
+                    { id: 8, class: 'scale-[3.5] translate-x-[33%] translate-y-[-11%]' },
+                    { id: 9, class: 'scale-[3.5] translate-x-[-33%] translate-y-[11%]' },
+                    { id: 10, class: 'scale-[3.5] translate-x-[-11%] translate-y-[11%]' },
+                    { id: 11, class: 'scale-[3.5] translate-x-[11%] translate-y-[11%]' },
+                    { id: 12, class: 'scale-[3.5] translate-x-[33%] translate-y-[11%]' }
+                ],
+                init() {
+                    this.socket = io();
+
+                    this.socket.on('game-state', (state) => {
+                        // Detect new player joining while in lobby
+                        if (state.state === 'LOBBY' && state.players && this.prevPlayerIds.length > 0) {
+                            const newPlayers = state.players.filter(p => !this.prevPlayerIds.includes(p.id));
+                            if (newPlayers.length > 0) {
+                                const newest = newPlayers[newPlayers.length - 1];
+                                this.newPlayerNotification = newest;
+                                if (this.notificationTimer) clearTimeout(this.notificationTimer);
+                                this.notificationTimer = setTimeout(() => {
+                                    this.newPlayerNotification = null;
+                                }, 3500);
+                            }
+                        }
+                        if (state.players) {
+                            this.prevPlayerIds = state.players.map(p => p.id);
+                        }
+
+                        this.gameState = state;
+
+                        // Trigger QR generation when IP is set
+                        if (state.hostIP) {
+                            const joinUrl = `http://${state.hostIP}:${state.hostPort}/?pin=${state.pin}`;
+                            new QRious({
+                                element: document.getElementById('lobby-qr'),
+                                value: joinUrl,
+                                size: 300,
+                                background: 'white',
+                                foreground: '#10131b'
+                            });
+                        }
+
+                        // Trigger confetti on GAME_OVER
+                        if (state.state === 'GAME_OVER') {
+                            this.$nextTick(() => {
+                                startConfetti();
+                            });
+                        }
+                    });
+
+                    this.socket.on('timer-tick', (time) => {
+                        this.gameState.timeRemaining = time;
+                    });
+                },
+                activeQuestionDuration() {
+                    if (this.gameState.currentQuestion) {
+                        return this.gameState.currentQuestion.timeLimit;
+                    }
+                    return 20;
+                },
+                answeredCount() {
+                    if (!this.gameState.players) return 0;
+                    return this.gameState.players.filter(p => p.hasAnswered).length;
+                },
+                maxScore() {
+                    if (!this.gameState.leaderboard || this.gameState.leaderboard.length === 0) return 0;
+                    return this.gameState.leaderboard[0].score;
+                },
+                getOptionCount(idx) {
+                    if (!this.gameState.players) return 0;
+                    return this.gameState.players.filter(p => p.answerIndex === idx).length;
+                },
+                maxSelectCount() {
+                    let counts = [0, 1, 2, 3].map(idx => this.getOptionCount(idx));
+                    return Math.max(...counts, 1); // Avoid division by zero
+                },
+                rankLabel(n) {
+                    const labels = { 4: '4TH', 5: '5TH', 6: '6TH', 7: '7TH', 8: '8TH', 9: '9TH', 10: '10TH' };
+                    return labels[n] || `${n}TH`;
+                },
+                correctOptionColor() {
+                    const q = this.gameState.currentQuestion;
+                    if (!q) return { bgClass: 'bg-white/5 text-outline-variant', icon: 'help' };
+                    const idx = q.correctIndex;
+                    if (idx === 0) return { bgClass: 'bg-[#ff003c] text-white border-[#ff003c]', icon: 'change_history' };
+                    if (idx === 1) return { bgClass: 'bg-[#00a2ff] text-white border-[#00a2ff]', icon: 'diamond' };
+                    if (idx === 2) return { bgClass: 'bg-[#ffd600] text-white border-[#ffd600]', icon: 'circle' };
+                    if (idx === 3) return { bgClass: 'bg-[#2ae500] text-white border-[#2ae500]', icon: 'square' };
+                    return { bgClass: 'bg-white/5', icon: 'help' };
+                }
+            };
+        }
+
+        // Canvas Confetti system
+        let confettiInterval = null;
+        function startConfetti() {
+            const canvas = document.getElementById('confetti');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let pieces = [];
+            const numberOfPieces = 150;
+            const colors = ['#adc7ff', '#79ff5b', '#ffd700', '#c0c0c0', '#cd7f32', '#4a8eff'];
+
+            class Piece {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * -canvas.height;
+                    this.rotation = Math.random() * Math.PI * 2;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+                    this.width = Math.random() * 10 + 6;
+                    this.height = Math.random() * 10 + 6;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.gravity = Math.random() * 1.5 + 2;
+                    this.drift = (Math.random() - 0.5) * 1.5;
+                }
+            }
+
+            function update() {
+                if (canvas.style.display === 'none') return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (pieces.length < numberOfPieces) {
+                    pieces.push(new Piece());
+                }
+
+                pieces.forEach((p, i) => {
+                    p.y += p.gravity;
+                    p.x += p.drift;
+                    p.rotation += p.rotationSpeed;
+
+                    if (p.y > canvas.height) {
+                        pieces[i] = new Piece();
+                        pieces[i].y = -20;
+                    }
+
+                    ctx.save();
+                    ctx.fillStyle = p.color;
+                    ctx.translate(p.x + p.width / 2, p.y + p.height / 2);
+                    ctx.rotate(p.rotation);
+                    ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
+                    ctx.restore();
+                });
+
+                confettiInterval = requestAnimationFrame(update);
+            }
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            if (confettiInterval) {
+                cancelAnimationFrame(confettiInterval);
+            }
+            update();
+        }
+    </script>
+</body>
+</html>
+

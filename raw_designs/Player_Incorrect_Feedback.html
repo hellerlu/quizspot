@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuizMaster - Incorrect Feedback</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001a41",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#053900",
+                        "on-primary-container": "#00285b",
+                        "tertiary-fixed": "#e1e2eb",
+                        "surface-container-low": "#181c23",
+                        "primary-container": "#4a8eff",
+                        "primary-fixed": "#d8e2ff",
+                        "secondary-fixed": "#79ff5b",
+                        "on-tertiary-fixed": "#191c22",
+                        "inverse-on-surface": "#2d3039",
+                        "on-secondary-fixed-variant": "#095300",
+                        "background": "#10131b",
+                        "primary-fixed-dim": "#adc7ff",
+                        "primary": "#adc7ff",
+                        "tertiary-fixed-dim": "#c4c6cf",
+                        "surface": "#10131b",
+                        "surface-container-highest": "#31353d",
+                        "on-primary": "#002e68",
+                        "on-secondary-fixed": "#022100",
+                        "surface-bright": "#363942",
+                        "inverse-primary": "#005bc0",
+                        "on-primary-fixed-variant": "#004493",
+                        "outline": "#8b90a0",
+                        "error-container": "#93000a",
+                        "secondary-container": "#2ff801",
+                        "surface-container": "#1c2027",
+                        "tertiary-container": "#8e9099",
+                        "surface-container-high": "#272a32",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0b0e16",
+                        "on-tertiary-fixed-variant": "#44474e",
+                        "on-surface-variant": "#c1c6d7",
+                        "surface-dim": "#10131b",
+                        "tertiary": "#c4c6cf",
+                        "inverse-surface": "#e0e2ed",
+                        "secondary": "#d7ffc5",
+                        "on-background": "#e0e2ed",
+                        "on-secondary-container": "#0f6d00",
+                        "surface-variant": "#31353d",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e0e2ed",
+                        "on-tertiary-container": "#272a30",
+                        "secondary-fixed-dim": "#2ae500",
+                        "on-tertiary": "#2e3037",
+                        "surface-tint": "#adc7ff",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter-mobile": "16px",
+                        "xl": "80px",
+                        "sm": "12px",
+                        "safe-area-tv": "5%",
+                        "md": "24px",
+                        "xs": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "display-tv": ["Sora"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Sora"],
+                        "headline-lg-mobile": ["Sora"],
+                        "headline-sm": ["Sora"],
+                        "label-bold": ["Sora"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-mobile": ["Sora"],
+                        "headline-lg": ["Sora"]
+                    },
+                    "fontSize": {
+                        "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                        "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                        "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                        "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake-impact {
+            animation: shake 0.2s ease-in-out 0s 2;
+        }
+        .vignette-error {
+            background: radial-gradient(circle, transparent 40%, rgba(147, 0, 10, 0.4) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-error-container text-on-error-container min-h-screen flex flex-col items-center justify-between overflow-hidden">
+<!-- Top App Bar (Suppressed because this is a Focused Transactional State, but UI rules suggest if it's top-level navigation it might show. Here we prioritize the high-impact canvas) -->
+<!-- Background Impact Effect -->
+<div class="fixed inset-0 vignette-error pointer-events-none"></div>
+<!-- Main Feedback Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center w-full px-gutter-mobile z-10 text-center">
+<!-- Massive Icon Wrapper -->
+<div class="mb-lg shake-impact">
+<div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-8 border-on-error-container flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-[80px] md:text-[120px] text-on-error-container" style="font-variation-settings: 'FILL' 0;">close</span>
+</div>
+</div>
+<!-- High Impact Typography -->
+<h1 class="font-display-mobile text-display-mobile md:font-display-tv md:text-display-tv tracking-tighter mb-sm uppercase">
+            INCORRECT!
+        </h1>
+<!-- Contextual Info Card (Glassmorphism) -->
+<div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl px-lg py-md w-full max-w-sm mt-md shadow-2xl">
+<p class="font-label-bold text-label-bold text-on-error-container/80 mb-xs uppercase tracking-widest">Current Score</p>
+<p class="font-headline-sm text-headline-sm-mobile md:text-headline-sm font-bold">
+                4,500
+            </p>
+</div>
+<!-- Correct Answer Reveal (Secondary Info) -->
+<div class="mt-lg opacity-80">
+<p class="font-body-md text-body-md italic">
+                The correct answer was: <span class="font-bold">Tokyo</span>
+</p>
+</div>
+</main>
+<!-- Bottom Action Area -->
+<footer class="w-full px-gutter-mobile pb-xl z-10 flex flex-col gap-md items-center">
+<!-- Encouragement / Streak Status -->
+<div class="flex items-center gap-sm bg-black/20 px-md py-sm rounded-full">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">heart_broken</span>
+<span class="font-label-bold text-label-bold">Streak Ended!</span>
+</div>
+<!-- Wait for next question or manual skip -->
+<div class="w-full max-w-xs h-2 bg-on-error-container/20 rounded-full overflow-hidden">
+<div class="h-full bg-on-error-container w-full origin-left animate-[shrink_5s_linear_forwards]"></div>
+</div>
+<p class="font-label-bold text-label-bold opacity-60">Waiting for next question...</p>
+</footer>
+<style>
+        @keyframes shrink {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+    </style>
+<!-- Background Atmospheric Image -->
+<div class="fixed inset-0 -z-10 opacity-30">
+<img alt="High energy game show abstract" class="w-full h-full object-cover" data-alt="An abstract digital background featuring intense red light trails and dark geometric shadows that create a sense of dynamic movement and competitive energy. The lighting is dramatic and moody, focusing on saturated deep reds and obsidian blacks. This high-impact visual style complements a professional gaming interface, using sharp diagonal lines and blurred light effects to evoke a high-stakes, fast-paced atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBUHxsdbVbIArHr7sKOlRcM4y3bB5KGZVmjPqMnQOmLjOw7vFFSB7jM1_xr1vB354EWNrl586mUxBl5kwSfXbwYKxtiliXL_IsqbISArz0yt3w7QQJ1EULPGSTYIJoFXydNzmGjyK_jVanj3UmvrpVQ3-8ixVEyi3uVmKKL4skSmA7O6nZY-Z9vsh4SguppclVnW0MQZJdRuFl9t-SyRRJ2J5vi16H0tvukes3Em_aCzKd1M575FEOzwkxslaCDM60Or9lRMod9tcM"/>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple haptic-like visual feedback or timed redirect simulation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Trigger a minor "thud" scale on the score card after a delay
+            setTimeout(() => {
+                const card = document.querySelector('.bg-white\\/10');
+                if(card) {
+                    card.classList.add('scale-105');
+                    setTimeout(() => card.classList.remove('scale-105'), 150);
+                }
+            }, 500);
+        });
+    </script>
+</body></html>

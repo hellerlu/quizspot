@@ -1,0 +1,310 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>QuizMaster - Question Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Sora:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .neon-glow-success {
+            box-shadow: 0 0 15px rgba(121, 255, 91, 0.4);
+        }
+        /* Custom scrollbar for deep dark theme */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #10131b; }
+        ::-webkit-scrollbar-thumb { background: #31353d; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001a41",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#053900",
+                        "on-primary-container": "#00285b",
+                        "tertiary-fixed": "#e1e2eb",
+                        "surface-container-low": "#181c23",
+                        "primary-container": "#4a8eff",
+                        "primary-fixed": "#d8e2ff",
+                        "secondary-fixed": "#79ff5b",
+                        "on-tertiary-fixed": "#191c22",
+                        "inverse-on-surface": "#2d3039",
+                        "on-secondary-fixed-variant": "#095300",
+                        "background": "#10131b",
+                        "primary-fixed-dim": "#adc7ff",
+                        "primary": "#adc7ff",
+                        "tertiary-fixed-dim": "#c4c6cf",
+                        "surface": "#10131b",
+                        "surface-container-highest": "#31353d",
+                        "on-primary": "#002e68",
+                        "on-secondary-fixed": "#022100",
+                        "surface-bright": "#363942",
+                        "inverse-primary": "#005bc0",
+                        "on-primary-fixed-variant": "#004493",
+                        "outline": "#8b90a0",
+                        "error-container": "#93000a",
+                        "secondary-container": "#2ff801",
+                        "surface-container": "#1c2027",
+                        "tertiary-container": "#8e9099",
+                        "surface-container-high": "#272a32",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0b0e16",
+                        "on-tertiary-fixed-variant": "#44474e",
+                        "on-surface-variant": "#c1c6d7",
+                        "surface-dim": "#10131b",
+                        "tertiary": "#c4c6cf",
+                        "inverse-surface": "#e0e2ed",
+                        "secondary": "#d7ffc5",
+                        "on-background": "#e0e2ed",
+                        "on-secondary-container": "#0f6d00",
+                        "surface-variant": "#31353d",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e0e2ed",
+                        "on-tertiary-container": "#272a30",
+                        "secondary-fixed-dim": "#2ae500",
+                        "on-tertiary": "#2e3037",
+                        "surface-tint": "#adc7ff",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter-mobile": "16px",
+                        "xl": "80px",
+                        "sm": "12px",
+                        "safe-area-tv": "5%",
+                        "md": "24px",
+                        "xs": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "display-tv": ["Sora"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Sora"],
+                        "headline-lg-mobile": ["Sora"],
+                        "headline-sm": ["Sora"],
+                        "label-bold": ["Sora"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-mobile": ["Sora"],
+                        "headline-lg": ["Sora"]
+                    },
+                    "fontSize": {
+                        "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                        "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                        "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                        "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-24">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 dark:bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile md:px-lg shadow-none py-2">
+<div class="flex items-center gap-4">
+<button class="text-primary hover:bg-white/10 transition-colors rounded-full active:scale-95 transition-transform duration-150 px-1">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<h1 class="font-display-mobile text-display-mobile text-primary tracking-tighter italic">QuizSpot</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="rounded-full overflow-hidden border-2 border-primary/20" style="width: 32px; height: 32px;">
+<img alt="Host Admin Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj_Ib3LNHSWmx5mIZcCiLysl2tLSsWoJAvgNMEG4jCt0qF0QLB1YrXiFS9df5YJfomwtDsZijwZwhejIy1cf6AnnYS4ExLN6kBhLV8T-8eGYo40so1UTMUaAg-73kq2Qg_YbnVzWrTs-0ceCli055swbJI7yPUVtrsLumO1ISxjt2AEHUrFC37SBUvPB5gECW74zlLTX5cUE2YTYAMkp58dm-KigB5KMPXqogoyXp0IT81Er3ccHumkp9ShrlG2TkROUrNwsl3_pa2">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-gutter-mobile max-w-2xl mx-auto space-y-6">
+<!-- Header Section -->
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm-mobile text-primary">Edit Question</h2>
+<div class="glass-panel px-3 py-1 rounded-full text-secondary-fixed border border-secondary-fixed/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="font-label-bold text-label-bold">Draft</span>
+</div>
+</div>
+<!-- Editor Form -->
+<div class="space-y-6">
+<!-- Question Textarea -->
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-outline-variant px-1">Question Text</label>
+<div class="glass-panel rounded-xl p-xs">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-body-lg font-body-lg text-on-surface placeholder:text-outline-variant/50 min-h-[120px] resize-none" placeholder="What is the capital of France?"></textarea>
+</div>
+</div>
+<!-- Settings Row (Time & Points) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-outline-variant px-1">Time Limit</label>
+<div class="glass-panel rounded-xl flex items-center px-4 py-3 gap-3">
+<span class="material-symbols-outlined text-primary">timer</span>
+<select class="w-full bg-transparent border-none focus:ring-0 text-on-surface appearance-none font-label-bold">
+<option value="5s">5s</option>
+<option selected="" value="10s">10s</option>
+<option value="20s">20s</option>
+<option value="30s">30s</option>
+<option value="60s">60s</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-outline-variant px-1">Point Value</label>
+<div class="glass-panel rounded-xl flex items-center px-4 py-3 gap-3">
+<span class="material-symbols-outlined text-primary">workspace_premium</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-label-bold" step="500" type="number" value="1000">
+</div>
+</div>
+</div>
+<!-- Answers Grid -->
+<div class="space-y-3">
+<label class="font-label-bold text-label-bold text-outline-variant px-1">Answers &amp; Correct State</label>
+<!-- Answer A -->
+<div class="flex items-center gap-3">
+<div class="flex-grow glass-panel rounded-xl flex items-center px-4 py-4 gap-4 border-l-4 border-l-red-500">
+<span class="font-headline-sm text-red-500 text-xl">A</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30" placeholder="Paris" type="text">
+</div>
+<label class="cursor-pointer">
+<input checked="" class="hidden peer" name="correct_answer" type="radio">
+<div class="w-12 h-12 rounded-xl glass-panel border-2 border-white/5 flex items-center justify-center peer-checked:bg-secondary-fixed peer-checked:border-secondary-fixed peer-checked:text-on-secondary transition-all active:scale-90 peer-checked:neon-glow-success">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</label>
+</div>
+<!-- Answer B -->
+<div class="flex items-center gap-3">
+<div class="flex-grow glass-panel rounded-xl flex items-center px-4 py-4 gap-4 border-l-4 border-l-blue-500">
+<span class="font-headline-sm text-blue-500 text-xl">B</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30" placeholder="London" type="text">
+</div>
+<label class="cursor-pointer">
+<input class="hidden peer" name="correct_answer" type="radio">
+<div class="w-12 h-12 rounded-xl glass-panel border-2 border-white/5 flex items-center justify-center peer-checked:bg-secondary-fixed peer-checked:border-secondary-fixed peer-checked:text-on-secondary transition-all active:scale-90 peer-checked:neon-glow-success">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</label>
+</div>
+<!-- Answer C -->
+<div class="flex items-center gap-3">
+<div class="flex-grow glass-panel rounded-xl flex items-center px-4 py-4 gap-4 border-l-4 border-l-yellow-500">
+<span class="font-headline-sm text-yellow-500 text-xl">C</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30" placeholder="Berlin" type="text">
+</div>
+<label class="cursor-pointer">
+<input class="hidden peer" name="correct_answer" type="radio">
+<div class="w-12 h-12 rounded-xl glass-panel border-2 border-white/5 flex items-center justify-center peer-checked:bg-secondary-fixed peer-checked:border-secondary-fixed peer-checked:text-on-secondary transition-all active:scale-90 peer-checked:neon-glow-success">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</label>
+</div>
+<!-- Answer D -->
+<div class="flex items-center gap-3">
+<div class="flex-grow glass-panel rounded-xl flex items-center px-4 py-4 gap-4 border-l-4 border-l-green-500">
+<span class="font-headline-sm text-green-500 text-xl">D</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30" placeholder="Madrid" type="text">
+</div>
+<label class="cursor-pointer">
+<input class="hidden peer" name="correct_answer" type="radio">
+<div class="w-12 h-12 rounded-xl glass-panel border-2 border-white/5 flex items-center justify-center peer-checked:bg-secondary-fixed peer-checked:border-secondary-fixed peer-checked:text-on-secondary transition-all active:scale-90 peer-checked:neon-glow-success">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Media Placeholder -->
+<div class="glass-panel rounded-2xl overflow-hidden aspect-video group relative cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cinematic, high-contrast digital illustration of the Eiffel Tower at night, glowing with electric blue and purple neon lights. The surrounding Paris cityscape is rendered in a minimalist, deep navy aesthetic with vibrant light streaks. The mood is high-energy and competitive, perfectly matching the QuizMaster visual style of dark mode and glassmorphism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbHxuubtpW6XoVZRD-l-QjrLywlneVRtxB-0xloyoCP_HwgP81T4ZsKiAxQg-F4uVmQpnTlH63UCXWE9mGAL1rToLO1ngbe5wqHtU2Mzk2LyybUkBEiY99VPPe_Q0MLejpLT-N-3F3e1gptDY6aLsRsZF92mjNXNlLJs0PtNObIDrQ5_eWcDFXI2ZhKTIhLrxOWXIak8uwN7os2u74VZFwvmhu6pfEXeTJf3O96vc9Ve_ujqjHyltiVehDql5qa8Fu7AX8H-2SPowg">
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 group-hover:bg-black/20 transition-all">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">add_photo_alternate</span>
+<span class="font-label-bold text-label-bold text-primary">Change Image</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex gap-4 pt-4">
+<button class="flex-1 bg-surface-container-highest text-on-surface py-4 rounded-xl font-label-bold active:scale-95 transition-transform">
+                    Delete
+                </button>
+<button class="flex-[2] bg-primary-container text-on-primary-container py-4 rounded-xl font-label-bold neon-glow-primary active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                    Save Question
+                </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Filtered for Top-Level relevance, keeping it for contextual navigation back to Library) -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container-lowest/80 dark:bg-surface-container-lowest/80 backdrop-blur-2xl flex justify-around items-center h-20 w-full px-4 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-6 py-2 transition-transform duration-200 active:scale-90">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-bold text-label-bold">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-bold text-label-bold">Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-bold text-label-bold">Groups</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-bold text-label-bold">Create</span>
+</div>
+</nav>
+<script>
+        // Micro-interaction for the radio buttons
+        const radios = document.querySelectorAll('input[name="correct_answer"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                // Add a haptic feedback feel if it were a mobile app
+                console.log('Answer selected');
+            });
+        });
+
+        // Floating button logic simulation
+        document.querySelector('button.bg-primary-container').addEventListener('click', function() {
+            this.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Saving...';
+            setTimeout(() => {
+                this.innerHTML = '<span class="material-symbols-outlined">check</span> Saved!';
+                setTimeout(() => {
+                    this.innerHTML = '<span class="material-symbols-outlined">save</span> Save Question';
+                }, 2000);
+            }, 800);
+        });
+    </script>
+
+
+</body></html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>QuizMaster Host Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .neon-glow-secondary {
+            box-shadow: 0 0 20px rgba(121, 255, 91, 0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(173, 199, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001a41",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#053900",
+                        "on-primary-container": "#00285b",
+                        "tertiary-fixed": "#e1e2eb",
+                        "surface-container-low": "#181c23",
+                        "primary-container": "#4a8eff",
+                        "primary-fixed": "#d8e2ff",
+                        "secondary-fixed": "#79ff5b",
+                        "on-tertiary-fixed": "#191c22",
+                        "inverse-on-surface": "#2d3039",
+                        "on-secondary-fixed-variant": "#095300",
+                        "background": "#10131b",
+                        "primary-fixed-dim": "#adc7ff",
+                        "primary": "#adc7ff",
+                        "tertiary-fixed-dim": "#c4c6cf",
+                        "surface": "#10131b",
+                        "surface-container-highest": "#31353d",
+                        "on-primary": "#002e68",
+                        "on-secondary-fixed": "#022100",
+                        "surface-bright": "#363942",
+                        "inverse-primary": "#005bc0",
+                        "on-primary-fixed-variant": "#004493",
+                        "outline": "#8b90a0",
+                        "error-container": "#93000a",
+                        "secondary-container": "#2ff801",
+                        "surface-container": "#1c2027",
+                        "tertiary-container": "#8e9099",
+                        "surface-container-high": "#272a32",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0b0e16",
+                        "on-tertiary-fixed-variant": "#44474e",
+                        "on-surface-variant": "#c1c6d7",
+                        "surface-dim": "#10131b",
+                        "tertiary": "#c4c6cf",
+                        "inverse-surface": "#e0e2ed",
+                        "secondary": "#d7ffc5",
+                        "on-background": "#e0e2ed",
+                        "on-secondary-container": "#0f6d00",
+                        "surface-variant": "#31353d",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e0e2ed",
+                        "on-tertiary-container": "#272a30",
+                        "secondary-fixed-dim": "#2ae500",
+                        "on-tertiary": "#2e3037",
+                        "surface-tint": "#adc7ff",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "gutter-mobile": "16px",
+                        "xl": "80px",
+                        "sm": "12px",
+                        "safe-area-tv": "5%",
+                        "md": "24px",
+                        "xs": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "display-tv": ["Sora"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Sora"],
+                        "headline-lg-mobile": ["Sora"],
+                        "headline-sm": ["Sora"],
+                        "label-bold": ["Sora"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "display-mobile": ["Sora"],
+                        "headline-lg": ["Sora"]
+                    },
+                    "fontSize": {
+                        "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "120%", "fontWeight": "700"}],
+                        "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+                        "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+                        "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+                        "display-mobile": ["40px", {"lineHeight": "110%", "fontWeight": "800"}],
+                        "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md overflow-hidden selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-2">
+<div class="flex items-center gap-sm active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-primary">grid_view</span>
+<h1 class="font-display-mobile text-[24px] text-primary tracking-tighter italic font-extrabold uppercase">QuizSpot</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex flex-col items-end hidden sm:flex">
+<span class="font-label-bold text-xs text-outline">GAME PIN</span>
+<span class="text-secondary-fixed font-bold tracking-widest">882-192</span>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 overflow-hidden">
+<img alt="Admin Avatar" class="w-full h-full object-cover bg-surface-container-highest rounded-full" data-alt="A stylized 3D avatar of a professional game host with modern glasses and a confident smile. The avatar is rendered in a high-fidelity digital art style with soft rim lighting and a vibrant indigo background. The mood is professional, electric, and welcoming, perfectly matching a high-energy game show aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACi5RC8q4_YSn50W1DSwCiHruP5U6WOW-WeMvs7rVauuDsNfGpoWYkPWCjHlKxMP6kmT4c57G_r04Ka3QgXak8BdIJJ2AbN9WxurNlyGJqhlZ0PByJXBLnCjUjWf2lxXyRJYwCShgzZPCAxnQYomiX10Qpjf2mUjbY2L1DOiavkymhjrkYgIjMavRE-3Zd7Jh5zwhGWJHG1ICPuCFcYAhxNmW7F3ylyQd_teOhrLy4s7LC4Qm7yNN4e5cPTGaET-j1N0rdSOAfICPj">
+</div>
+</div>
+</header>
+<main class="h-screen pb-[100px] flex flex-col px-gutter-mobile gap-md pt-[64px]">
+<!-- Progress Header -->
+<section class="mt-4 flex flex-col items-center gap-xs">
+<span class="text-primary font-label-bold tracking-[0.2em] text-xs uppercase opacity-80">Live Session</span>
+<div class="flex items-center gap-md">
+<h2 class="font-headline-sm text-headline-sm-mobile text-on-surface">Question 3/10</h2>
+<div class="px-3 py-1 bg-primary-container/20 rounded-full border border-primary/30 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+<span class="text-[14px] font-bold text-primary">LIVE</span>
+</div>
+</div>
+</section>
+<!-- Player List Container -->
+<section class="flex-grow glass-card rounded-2xl p-md flex flex-col gap-md overflow-hidden min-h-0">
+<div class="flex justify-between items-center shrink-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">groups</span>
+<h3 class="font-label-bold text-on-surface-variant">Connected Players (12)</h3>
+</div>
+<button class="text-primary text-sm font-bold flex items-center gap-1 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg">sync</span>
+</button>
+</div>
+<!-- Scrollable Nicknames -->
+<div class="flex-grow overflow-y-auto pr-2 space-y-3">
+<!-- Player Rows -->
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-on-primary-container font-bold text-xs">AL</div>
+<span class="font-bold text-on-surface">Alex_The_Great</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 0s;"></span>
+</div>
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-secondary-container to-secondary-fixed flex items-center justify-center text-on-secondary-container font-bold text-xs">JO</div>
+<span class="font-bold text-on-surface">JordanVibe</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 0.2s;"></span>
+</div>
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-tertiary-container to-tertiary-fixed-dim flex items-center justify-center text-on-tertiary-container font-bold text-xs">SA</div>
+<span class="font-bold text-on-surface">SarahDesigner</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 0.4s;"></span>
+</div>
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors opacity-80">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-outline font-bold text-xs">MX</div>
+<span class="font-bold text-on-surface">MaxPixel</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 0.6s;"></span>
+</div>
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-fixed-dim flex items-center justify-center text-on-primary-fixed-variant font-bold text-xs">CH</div>
+<span class="font-bold text-on-surface">ChrisQuiz</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 0.8s;"></span>
+</div>
+<div class="flex items-center justify-between p-sm glass-card border-none rounded-xl hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-on-secondary-container flex items-center justify-center text-white font-bold text-xs">EM</div>
+<span class="font-bold text-on-surface">Emma_01</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)] animate-pulse" style="animation-delay: 1s;"></span>
+</div>
+</div>
+</section>
+<!-- Primary Action Area -->
+<section class="flex flex-col items-center gap-md shrink-0">
+<button class="group relative w-full py-6 rounded-2xl bg-primary text-on-primary font-headline-sm text-headline-sm-mobile active:scale-95 transition-all duration-150 neon-glow-primary overflow-hidden" id="startBtn">
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center justify-center gap-md relative z-10">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<span class="">Start Question</span>
+</div>
+</button>
+<button class="flex items-center gap-sm px-6 py-3 rounded-full text-outline-variant font-label-bold active:scale-90 transition-transform hover:text-primary">
+<span class="material-symbols-outlined text-lg">fast_forward</span>
+<span class="">Force Next Question</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container-lowest/80 backdrop-blur-2xl shadow-[0_-8px_30px_rgb(0,0,0,0.5)] flex justify-around items-center h-20 px-4">
+<a class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-bold text-[10px] mt-1 uppercase tracking-tighter">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-bold text-[10px] mt-1 uppercase tracking-tighter">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-6 py-2 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-bold text-[10px] mt-1 uppercase tracking-tighter">Groups</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline-variant p-2 hover:text-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-bold text-[10px] mt-1 uppercase tracking-tighter">Create</span>
+</a>
+</nav>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+<div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-secondary-fixed/5 blur-[120px] rounded-full"></div>
+</div>
+<script>
+        // Micro-interaction for the start button
+        const startBtn = document.getElementById('startBtn');
+        startBtn.addEventListener('click', () => {
+            const ripple = document.createElement('div');
+            ripple.classList.add('absolute', 'inset-0', 'bg-white/20', 'animate-ping');
+            startBtn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1000);
+        });
+
+        // Add some "waiting" animation logic to status dots
+        document.querySelectorAll('.bg-secondary-fixed.shadow-\\[0_0_8px_rgba\\(121\\,255\\,91\\,1\\)\\]').forEach((dot, index) => {
+            dot.style.animationDelay = `${index * 0.2}s`;
+            dot.classList.add('animate-pulse');
+        });
+    </script>
+
+
+</body></html>

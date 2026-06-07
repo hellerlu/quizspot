@@ -1,0 +1,313 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .neon-grid {
+      background-size: 100px 100px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .bar-glow {
+      filter: drop-shadow(0 0 15px currentColor);
+    }
+    @keyframes growWidth {
+      from { width: 0; }
+      to { width: var(--final-width); }
+    }
+    .animate-grow {
+      animation: growWidth 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#001a41",
+            "outline-variant": "#414754",
+            "on-secondary": "#053900",
+            "on-primary-container": "#00285b",
+            "tertiary-fixed": "#e1e2eb",
+            "surface-container-low": "#181c23",
+            "primary-container": "#4a8eff",
+            "primary-fixed": "#d8e2ff",
+            "secondary-fixed": "#79ff5b",
+            "on-tertiary-fixed": "#191c22",
+            "inverse-on-surface": "#2d3039",
+            "on-secondary-fixed-variant": "#095300",
+            "background": "#10131b",
+            "primary-fixed-dim": "#adc7ff",
+            "primary": "#adc7ff",
+            "tertiary-fixed-dim": "#c4c6cf",
+            "surface": "#10131b",
+            "surface-container-highest": "#31353d",
+            "on-primary": "#002e68",
+            "on-secondary-fixed": "#022100",
+            "surface-bright": "#363942",
+            "inverse-primary": "#005bc0",
+            "on-primary-fixed-variant": "#004493",
+            "outline": "#8b90a0",
+            "error-container": "#93000a",
+            "secondary-container": "#2ff801",
+            "surface-container": "#1c2027",
+            "tertiary-container": "#8e9099",
+            "surface-container-high": "#272a32",
+            "on-error": "#690005",
+            "surface-container-lowest": "#0b0e16",
+            "on-tertiary-fixed-variant": "#44474e",
+            "on-surface-variant": "#c1c6d7",
+            "surface-dim": "#10131b",
+            "tertiary": "#c4c6cf",
+            "inverse-surface": "#e0e2ed",
+            "secondary": "#d7ffc5",
+            "on-background": "#e0e2ed",
+            "on-secondary-container": "#0f6d00",
+            "surface-variant": "#31353d",
+            "on-error-container": "#ffdad6",
+            "on-surface": "#e0e2ed",
+            "on-tertiary-container": "#272a30",
+            "secondary-fixed-dim": "#2ae500",
+            "on-tertiary": "#2e3037",
+            "surface-tint": "#adc7ff",
+            "error": "#ffb4ab"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "base": "8px",
+            "gutter-mobile": "16px",
+            "xl": "80px",
+            "sm": "12px",
+            "safe-area-tv": "5%",
+            "md": "24px",
+            "xs": "4px",
+            "lg": "48px"
+          },
+          "fontFamily": {
+            "display-tv": ["Sora"],
+            "body-md": ["Hanken Grotesk"],
+            "headline-md": ["Sora"],
+            "headline-sm": ["Sora"],
+            "label-bold": ["Sora"],
+            "body-lg": ["Hanken Grotesk"],
+            "headline-lg": ["Sora"]
+          },
+          "fontSize": {
+            "display-tv": ["96px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "body-md": ["18px", {"lineHeight": "150%", "fontWeight": "400"}],
+            "headline-md": ["48px", {"lineHeight": "120%", "fontWeight": "700"}],
+            "headline-sm": ["32px", {"lineHeight": "130%", "fontWeight": "600"}],
+            "label-bold": ["16px", {"lineHeight": "100%", "fontWeight": "700"}],
+            "body-lg": ["24px", {"lineHeight": "150%", "fontWeight": "400"}],
+            "headline-lg": ["64px", {"lineHeight": "120%", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen w-screen selection:bg-primary selection:text-on-primary">
+<!-- Top AppBar Anchor -->
+<header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-lg py-sm">
+<div class="flex items-center gap-md">
+<div class="p-2 hover:bg-white/10 transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-primary text-headline-sm">grid_view</span>
+</div>
+<h1 class="font-display-tv text-headline-sm text-primary tracking-tighter italic">QuizSpot</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="text-right hidden md:block">
+<p class="font-label-bold text-label-bold text-on-surface">Game Pin: 882 192</p>
+<p class="text-xs text-outline-variant uppercase tracking-widest">Live Broadcast</p>
+</div>
+<div class="rounded-full border-2 border-primary overflow-hidden h-10 w-10">
+<img alt="Host Avatar" data-alt="A professional high-resolution avatar of a charismatic game show host with stylish glasses and a modern haircut, rendered in a clean 3D clay style. The lighting is bright and theatrical with neon blue and purple accents in the background, maintaining the high-energy competitive aesthetic of the Quizmaster brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0L_Irc2Su9rDhrXwjUI27QkcdO8JSw7xmqFvFYNtcnloaT56G1PqWWzACRx9eJRNKO2-VBO8UCLxrCcHl-0xs1xb8moYpxtCHP1N618lan7jWvs2B1Kbn2b26Y_MmGyC65TXskGqz_MwoCY5WGZy8wn300DWbZoW0EQTDBbDDwVeRZA5unlDeFbOZ52ua40AMeYLsD6eNTkA1k8ozDfLE-yBZ8u83mJFPc3ko-ar1h-qx6snOHhpKxjXEUibmzJYwX_sfgp4_Mbj7">
+</div>
+</div>
+</header>
+<!-- Main TV Canvas -->
+<main class="relative h-screen w-screen neon-grid flex flex-col justify-center px-safe-area-tv pt-xl">
+<!-- Background Ambient Glows -->
+<div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- Header Section -->
+<div class="mb-lg flex items-end justify-between border-l-4 border-primary pl-md">
+<div>
+<h2 class="font-display-tv text-headline-lg text-on-surface uppercase tracking-tight">TOP SCORES</h2>
+<p class="font-body-lg text-outline-variant">The competition is heating up!</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-high px-md py-sm rounded-xl glass-panel">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="font-display-tv text-headline-sm text-secondary tabular-nums">00:45</span>
+</div>
+</div>
+<!-- Leaderboard Chart -->
+<div class="flex-1 flex flex-col justify-center gap-base">
+<!-- Player 1 (Gold/First) -->
+<div class="group relative flex items-center h-20 w-full">
+<div class="w-64 font-headline-sm text-on-surface pr-md truncate">ALEX J.</div>
+<div class="flex-1 h-full relative flex items-center">
+<div class="h-12 bg-secondary-fixed text-on-secondary-fixed animate-grow bar-glow flex items-center justify-end pr-md rounded-r-xl" style="--final-width: 95%; width: 0%; color: #022100;">
+<span class="font-display-tv text-headline-md tracking-tighter">18'420</span>
+</div>
+<!-- Rank Badge -->
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center text-on-secondary shadow-xl z-10 border-4 border-background">
+<span class="font-label-bold">1</span>
+</div>
+</div>
+</div>
+<!-- Player 2 -->
+<div class="group relative flex items-center h-20 w-full">
+<div class="w-64 font-headline-sm text-on-surface pr-md truncate">SARAH_W</div>
+<div class="flex-1 h-full relative flex items-center">
+<div class="h-12 bg-primary text-on-primary animate-grow bar-glow flex items-center justify-end pr-md rounded-r-xl" style="--final-width: 82%; width: 0%; animation-delay: 0.2s; color: #002e68;">
+<span class="font-display-tv text-headline-md tracking-tighter">15'890</span>
+</div>
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-xl z-10 border-4 border-background">
+<span class="font-label-bold">2</span>
+</div>
+</div>
+</div>
+<!-- Player 3 -->
+<div class="group relative flex items-center h-20 w-full">
+<div class="w-64 font-headline-sm text-on-surface pr-md truncate">PIXEL_MASTER</div>
+<div class="flex-1 h-full relative flex items-center">
+<div class="h-12 bg-tertiary-container text-on-tertiary-container animate-grow bar-glow flex items-center justify-end pr-md rounded-r-xl" style="--final-width: 70%; width: 0%; animation-delay: 0.4s; color: #272a30;">
+<span class="font-display-tv text-headline-md tracking-tighter">12'400</span>
+</div>
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-tertiary-container rounded-full flex items-center justify-center text-on-tertiary-container shadow-xl z-10 border-4 border-background">
+<span class="font-label-bold">3</span>
+</div>
+</div>
+</div>
+<!-- Player 4 -->
+<div class="group relative flex items-center h-20 w-full opacity-80">
+<div class="w-64 font-headline-sm text-on-surface pr-md truncate">REEMA.K</div>
+<div class="flex-1 h-full relative flex items-center">
+<div class="h-12 bg-surface-container-highest text-on-surface animate-grow flex items-center justify-end pr-md rounded-r-xl" style="--final-width: 55%; width: 0%; animation-delay: 0.6s;">
+<span class="font-display-tv text-headline-md tracking-tighter">9'120</span>
+</div>
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center text-on-surface shadow-xl z-10 border-4 border-background">
+<span class="font-label-bold">4</span>
+</div>
+</div>
+</div>
+<!-- Player 5 -->
+<div class="group relative flex items-center h-20 w-full opacity-60">
+<div class="w-64 font-headline-sm text-on-surface pr-md truncate">DAVE_B</div>
+<div class="flex-1 h-full relative flex items-center">
+<div class="h-12 bg-surface-container-highest text-on-surface animate-grow flex items-center justify-end pr-md rounded-r-xl" style="--final-width: 45%; width: 0%; animation-delay: 0.8s;">
+<span class="font-display-tv text-headline-md tracking-tighter">7'850</span>
+</div>
+<div class="absolute -left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center text-on-surface shadow-xl z-10 border-4 border-background">
+<span class="font-label-bold">5</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Footer Layout -->
+<div class="mt-lg flex items-center justify-between py-md border-t border-white/5">
+<div class="flex gap-md">
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 bg-secondary-fixed rounded-full bar-glow"></span>
+<span class="font-label-bold uppercase text-xs tracking-widest text-outline-variant">54 Players Connected</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+<span class="font-label-bold uppercase text-xs tracking-widest text-outline-variant">Round 8 / 10</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<div class="glass-panel px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">qr_code_2</span>
+<span class="font-label-bold">JOIN AT QUIZMASTER.TV</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Side Navigation Drawer (Hidden on TV but available in shell) -->
+<aside class="hidden h-full w-80 fixed left-0 top-0 z-50 bg-surface-container border-r border-outline-variant shadow-2xl flex-col py-lg pr-md">
+<div class="px-md mb-lg">
+<div class="flex items-center gap-md mb-md">
+<div class="w-14 h-14 rounded-full bg-primary-container overflow-hidden">
+<img alt="Admin User" data-alt="A detailed digital illustration of a game moderator profile picture. The character is a confident professional with a sleek headset, rendered in a crisp 2D vector style with vibrant gradients. The background consists of geometric abstract patterns in dark navy and electric blue." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHaF4fP9o-fBueK-suVJNMzQNhl5TBeGlzLHo3wUqf2HqrFKIFOtrYmJ2ZTsZvWj2qOmZjSs3IdS44QLcShXlCErMk9coh9AWA04AA-0Ox0XutkAwHpC-EMbA_em6YNcg7DMvsyJiScOJitB_9Yqdkln8c0GYckTaoRvNZnQRwqtzKw4FR1Ojk-DzMeuBxrptAbJ-w0WmrpSoB8MWKwJ7o1icd4z8Fb2d78snOOTuFQvee8vozz3D0jbBpF2L0hIGS5viEeTOFPO9V">
+</div>
+<div>
+<p class="font-headline-sm text-label-bold text-primary">Game Master</p>
+<p class="text-body-md text-on-surface-variant">Pro Account</p>
+</div>
+</div>
+</div>
+<nav class="flex-1">
+<ul class="space-y-1">
+<li class="pl-md pr-0">
+<a class="flex items-center gap-md p-4 bg-primary-container text-on-primary-container font-bold rounded-r-full transition-all" href="#">
+<span class="material-symbols-outlined">sports_esports</span>
+<span class="">My Games</span>
+</a>
+</li>
+<li class="pl-md pr-0">
+<a class="flex items-center gap-md p-4 text-on-surface-variant hover:bg-surface-container-highest rounded-r-full transition-colors" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="">Public Library</span>
+</a>
+</li>
+<li class="pl-md pr-0">
+<a class="flex items-center gap-md p-4 text-on-surface-variant hover:bg-surface-container-highest rounded-r-full transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="">Reports</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="px-md mt-auto pt-md border-t border-outline-variant">
+<p class="text-xs text-outline-variant font-mono">v2.4.0</p>
+</div>
+</aside>
+<script>
+    // Micro-interaction for score numbers counting up
+    document.addEventListener('DOMContentLoaded', () => {
+      const bars = document.querySelectorAll('.animate-grow');
+      bars.forEach(bar => {
+        const scoreSpan = bar.querySelector('span');
+        const targetScore = parseInt(scoreSpan.innerText.replace(/,/g, ''));
+        let currentScore = 0;
+        const duration = 1500;
+        const increment = targetScore / (duration / 16);
+
+        const updateScore = () => {
+          currentScore += increment;
+          if (currentScore < targetScore) {
+            scoreSpan.innerText = Math.floor(currentScore).toLocaleString();
+            requestAnimationFrame(updateScore);
+          } else {
+            scoreSpan.innerText = targetScore.toLocaleString();
+          }
+        };
+        
+        // Start counting after a slight delay to match animation
+        setTimeout(updateScore, 200);
+      });
+    });
+  </script>
+
+
+</body></html>

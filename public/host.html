@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>QuizSpot | Host Admin</title>
+    <!-- Compiled Tailwind stylesheet -->
+    <link href="/assets/style.css" rel="stylesheet"/>
+    <!-- Local Google Fonts & Icons -->
+    <link href="/assets/fonts/fonts.css" rel="stylesheet"/>
+    <link href="/assets/fonts/icons.css" rel="stylesheet"/>
+    <!-- Socket.io and Alpine.js -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script defer src="/assets/libs/alpine.min.js"></script>
+    <style>
+        body {
+            overscroll-behavior: none;
+            min-height: max(884px, 100dvh);
+            background-color: #10131b;
+            color: #e0e2ed;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow-primary {
+            box-shadow: 0 0 20px rgba(173, 199, 255, 0.3);
+        }
+        .neon-glow-secondary {
+            box-shadow: 0 0 20px rgba(121, 255, 91, 0.2);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Custom scrollbar for deep dark theme */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #10131b; }
+        ::-webkit-scrollbar-thumb { background: #31353d; border-radius: 10px; }
+    </style>
+</head>
+<body x-data="hostAdmin()" class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-primary/30">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-3">
+        <div class="flex items-center gap-sm cursor-pointer" @click="currentView = 'dashboard'">
+            <span class="material-symbols-outlined text-primary font-bold">grid_view</span>
+            <h1 class="font-display-mobile text-[24px] text-primary tracking-tighter italic font-extrabold uppercase leading-none">QuizSpot</h1>
+        </div>
+        <div class="flex items-center gap-md">
+            <div class="flex flex-col items-end" x-show="gameState.pin">
+                <span class="font-label-bold text-[10px] text-outline uppercase tracking-wider">GAME PIN</span>
+                <span class="text-secondary-fixed font-bold tracking-widest text-lg" x-text="gameState.pin"></span>
+            </div>
+            <!-- Admin Profile Avatar via Background Sprite -->
+            <div class="w-10 h-10 rounded-full border-2 border-primary/20 overflow-hidden bg-surface-container-highest shrink-0">
+                <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat" 
+                     style="background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: 33.33% 50%;"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Background Atmospheric Effect -->
+    <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+        <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
+        <div class="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-secondary-fixed/5 blur-[120px] rounded-full"></div>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="w-full max-w-2xl mx-auto px-gutter-mobile pt-24 pb-28 min-h-screen flex flex-col gap-md">
+
+        <!-- VIEW 1: QUIZ DASHBOARD -->
+        <div x-show="currentView === 'dashboard'" class="w-full space-y-md flex flex-col flex-grow">
+            <div class="flex justify-between items-center mt-2">
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm-mobile text-on-surface font-extrabold">Quiz Dashboard</h2>
+                    <p class="text-xs text-outline">Launch a game room or customize your quiz questions</p>
+                </div>
+                <button @click="openEditor()" class="bg-primary/10 text-primary border border-primary/20 px-4 py-2.5 rounded-xl font-label-bold text-sm flex items-center gap-sm hover:bg-primary/20 transition-all">
+                    <span class="material-symbols-outlined text-sm">edit</span>
+                    <span>Edit Quiz</span>
+                </button>
+            </div>
+
+            <!-- Quiz Details Card -->
+            <div class="glass-card rounded-xl p-md flex flex-col gap-sm border border-white/5 hover:border-primary/40 transition-all">
+                <div class="flex flex-col gap-sm w-full">
+                    <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Active Quiz Pack</label>
+                    <div class="flex gap-sm items-center w-full">
+                        <div class="relative flex-grow max-w-[280px]">
+                            <span class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">library_books</span>
+                            <select x-model="activeQuizFile" @change="selectQuiz(activeQuizFile)" class="w-full pl-10 pr-8 py-3 bg-[#1e2330] border border-white/10 rounded-xl text-on-surface font-label-bold focus:outline-none focus:border-primary/50 focus:ring-0 text-sm">
+                                <template x-for="qz in quizList" :key="qz.filename">
+                                    <option :value="qz.filename" x-text="`${qz.name} (${qz.questionCount} Qs)`" :selected="qz.filename === activeQuizFile" class="bg-[#1e2330] text-white"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <button @click="createNewQuiz()" class="bg-secondary-fixed text-on-secondary px-4 py-3 rounded-xl font-label-bold text-sm flex items-center gap-xs hover:scale-105 active:scale-95 transition-all shrink-0">
+                            <span class="material-symbols-outlined text-sm">add_circle</span>
+                            <span>New Quiz</span>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-xs text-outline px-1 mt-1">
+                        <span class="material-symbols-outlined text-[18px]">list_alt</span>
+                        <span class="font-label-bold text-label-bold" x-text="`${questions.length} Questions`"></span>
+                    </div>
+                </div>
+
+                <div class="h-px bg-white/10 w-full my-sm"></div>
+
+                <!-- Questions Preview List -->
+                <div class="space-y-sm max-h-[300px] overflow-y-auto pr-2">
+                    <template x-for="(q, idx) in questions" :key="idx">
+                        <div class="flex items-start gap-sm p-sm bg-surface-container-lowest/50 rounded-xl border border-white/5">
+                            <span class="font-label-bold text-xs text-primary w-6 pt-0.5" x-text="`${idx+1}.`"></span>
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-on-surface whitespace-normal break-words" x-text="q.question"></p>
+                                <p class="text-[10px] text-outline mt-1" x-text="`Correct: ${q.correctIndex === 0 ? 'A' : (q.correctIndex === 1 ? 'B' : (q.correctIndex === 2 ? 'C' : 'D'))} | Limit: ${q.timeLimit}s`"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="pt-sm">
+                    <button @click="launchLobby()" class="w-full bg-primary text-on-primary font-headline-sm text-base py-5 rounded-2xl active:scale-95 transition-all duration-150 neon-glow-primary flex items-center justify-center gap-md group">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">sensors</span>
+                        <span>LAUNCH GAME ROOM</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: QUESTION EDITOR -->
+        <div x-show="currentView === 'editor'" class="w-full space-y-md flex flex-col flex-grow">
+            <div class="flex justify-between items-center mt-2">
+                <div>
+                    <h2 class="font-headline-sm text-headline-sm-mobile text-on-surface font-extrabold">Question Editor</h2>
+                    <p class="text-xs text-outline">Manage trivia questions and save changes persistently</p>
+                </div>
+                <div class="flex gap-sm">
+                    <button @click="currentView = 'dashboard'" class="text-outline font-label-bold text-sm px-4 py-2 hover:text-white">Cancel</button>
+                    <button @click="saveQuiz()" class="bg-secondary-fixed text-on-secondary font-label-bold text-sm px-4 py-2.5 rounded-xl hover:scale-105 transition-all">Save Quiz</button>
+                </div>
+            </div>
+
+            <!-- Scrollable Questions Editor Forms -->
+            <div class="space-y-lg flex-grow max-h-[70vh] overflow-y-auto pr-2 pb-12">
+                <template x-for="(q, idx) in tempQuestions" :key="idx">
+                    <div class="glass-card rounded-2xl p-md space-y-md relative border border-white/10">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-headline-sm text-base text-primary font-black" x-text="`Question #${idx+1}`"></h4>
+                            <button @click="removeQuestion(idx)" class="text-error/80 hover:text-error text-xs font-label-bold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">delete</span> Remove
+                            </button>
+                        </div>
+
+                        <!-- Question Textarea -->
+                        <div class="space-y-xs">
+                            <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Question Text</label>
+                            <div class="glass-panel rounded-xl p-xs">
+                                <textarea x-model="q.question" class="w-full bg-transparent border-none focus:ring-0 text-base font-normal text-on-surface placeholder:text-outline-variant/50 min-h-[80px] resize-none focus:outline-none" placeholder="Enter question text..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Optional Question Image -->
+                        <div class="space-y-xs">
+                            <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Optional Question Image</label>
+                            <div class="glass-panel rounded-xl p-3 flex items-center justify-between gap-md">
+                                <div class="flex items-center gap-sm">
+                                    <span class="material-symbols-outlined text-primary">image</span>
+                                    <input type="file" accept="image/*" @change="uploadImage($event, q)" class="hidden" :id="'file-upload-' + idx">
+                                    <button type="button" @click="document.getElementById('file-upload-' + idx).click()" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-lg text-xs font-label-bold hover:bg-primary/20 transition-all cursor-pointer">
+                                        Choose Image
+                                    </button>
+                                </div>
+                                <div class="flex-grow text-xs text-outline truncate" x-text="q.image ? '' : 'No image uploaded'"></div>
+                                <template x-if="q.image">
+                                    <div class="flex items-center gap-sm shrink-0">
+                                        <img :src="q.image" class="w-10 h-10 object-cover rounded border border-white/10">
+                                        <button type="button" @click="q.image = ''" class="text-error hover:text-error/80 text-xs font-label-bold cursor-pointer">Remove</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Settings Row (Time Limit and Correct Index) -->
+                        <div class="grid grid-cols-2 gap-sm">
+                            <div class="space-y-xs">
+                                <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Time Limit</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">timer</span>
+                                    <select x-model.number="q.timeLimit" class="w-full pl-10 pr-8 py-3 bg-[#1e2330] border border-white/10 rounded-xl text-on-surface font-label-bold focus:outline-none focus:border-primary/50 focus:ring-0 text-sm">
+                                        <option value="5" class="bg-[#1e2330] text-white">5s</option>
+                                        <option value="10" class="bg-[#1e2330] text-white">10s</option>
+                                        <option value="15" class="bg-[#1e2330] text-white">15s</option>
+                                        <option value="20" class="bg-[#1e2330] text-white">20s</option>
+                                        <option value="25" class="bg-[#1e2330] text-white">25s</option>
+                                        <option value="30" class="bg-[#1e2330] text-white">30s</option>
+                                        <option value="35" class="bg-[#1e2330] text-white">35s</option>
+                                        <option value="40" class="bg-[#1e2330] text-white">40s</option>
+                                        <option value="45" class="bg-[#1e2330] text-white">45s</option>
+                                        <option value="50" class="bg-[#1e2330] text-white">50s</option>
+                                        <option value="55" class="bg-[#1e2330] text-white">55s</option>
+                                        <option value="60" class="bg-[#1e2330] text-white">60s</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-xs">
+                                <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Correct Answer</label>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">workspace_premium</span>
+                                    <select x-model.number="q.correctIndex" class="w-full pl-10 pr-8 py-3 bg-[#1e2330] border border-white/10 rounded-xl text-on-surface font-label-bold focus:outline-none focus:border-primary/50 focus:ring-0 text-sm">
+                                        <option value="0" class="bg-[#1e2330] text-white">A</option>
+                                        <option value="1" class="bg-[#1e2330] text-white">B</option>
+                                        <option value="2" class="bg-[#1e2330] text-white">C</option>
+                                        <option value="3" class="bg-[#1e2330] text-white">D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Answers Grid -->
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Answers</label>
+                            
+                            <!-- Answer A (Red) -->
+                            <div class="flex items-center gap-3">
+                                <div class="flex-grow glass-panel rounded-xl flex items-start px-4 py-3 gap-4 border-l-4 border-l-red-500">
+                                    <span class="font-headline-sm text-red-500 text-xl mt-1 select-none">A</span>
+                                    <textarea x-model="q.options[0]" class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30 focus:outline-none resize-none min-h-[48px] py-1 text-base leading-snug" placeholder="Red Option..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Answer B (Blue) -->
+                            <div class="flex items-center gap-3">
+                                <div class="flex-grow glass-panel rounded-xl flex items-start px-4 py-3 gap-4 border-l-4 border-l-blue-500">
+                                    <span class="font-headline-sm text-blue-500 text-xl mt-1 select-none">B</span>
+                                    <textarea x-model="q.options[1]" class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30 focus:outline-none resize-none min-h-[48px] py-1 text-base leading-snug" placeholder="Blue Option..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Answer C (Yellow) -->
+                            <div class="flex items-center gap-3">
+                                <div class="flex-grow glass-panel rounded-xl flex items-start px-4 py-3 gap-4 border-l-4 border-l-yellow-500">
+                                    <span class="font-headline-sm text-yellow-500 text-xl mt-1 select-none">C</span>
+                                    <textarea x-model="q.options[2]" class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30 focus:outline-none resize-none min-h-[48px] py-1 text-base leading-snug" placeholder="Yellow Option..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Answer D (Green) -->
+                            <div class="flex items-center gap-3">
+                                <div class="flex-grow glass-panel rounded-xl flex items-start px-4 py-3 gap-4 border-l-4 border-l-green-500">
+                                    <span class="font-headline-sm text-green-500 text-xl mt-1 select-none">D</span>
+                                    <textarea x-model="q.options[3]" class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline-variant/30 focus:outline-none resize-none min-h-[48px] py-1 text-base leading-snug" placeholder="Green Option..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <button @click="addQuestion()" class="w-full py-4 border-2 border-dashed border-primary/20 text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl font-label-bold text-sm flex items-center justify-center gap-sm transition-all">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    <span>Add Question</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: GAME CONTROLLER -->
+        <div x-show="currentView === 'controller'" class="w-full space-y-md flex flex-col flex-grow">
+            <!-- Progress Header -->
+            <section class="mt-2 flex flex-col items-center gap-xs text-center">
+                <span class="text-primary font-label-bold tracking-[0.2em] text-[10px] uppercase opacity-80">Live Session Lobby</span>
+                <div class="flex items-center gap-sm">
+                    <h2 class="font-headline-sm text-headline-sm-mobile text-on-surface font-extrabold"
+                        x-text="gameState.state === 'LOBBY' ? 'Waiting Room' : (gameState.state === 'GAME_OVER' ? 'Results Podium' : `Question ${gameState.currentQuestionIndex + 1}/${gameState.totalQuestions}`)">
+                    </h2>
+                    <div class="px-3 py-0.5 bg-primary-container/20 rounded-full border border-primary/30 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-primary" x-text="gameState.state"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dynamic Question Detail in Controller -->
+            <div x-show="gameState.state !== 'LOBBY' && gameState.state !== 'GAME_OVER' && gameState.currentQuestion"
+                 class="glass-card rounded-2xl p-sm flex flex-col gap-xs text-center border-l-4 border-primary/30">
+                <p class="text-sm font-bold text-white whitespace-normal break-words" x-text="gameState.currentQuestion ? gameState.currentQuestion.question : ''"></p>
+                <!-- Timer ticks -->
+                <p class="text-xs text-secondary-fixed" x-text="`Remaining: ${gameState.timeRemaining}s`"></p>
+            </div>
+
+            <!-- Player List Container -->
+            <section class="flex-grow glass-card rounded-2xl p-md flex flex-col gap-md min-h-[300px]">
+                <div class="flex justify-between items-center shrink-0">
+                    <div class="flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">groups</span>
+                        <h3 class="font-label-bold text-xs text-on-surface-variant uppercase tracking-wider" x-text="`Connected Players (${gameState.players ? gameState.players.length : 0})`"></h3>
+                    </div>
+                </div>
+
+                <!-- Scrollable Nicknames -->
+                <div class="flex-grow overflow-y-auto pr-2 space-y-3 max-h-[350px]">
+                    <template x-for="p in gameState.players" :key="p.id">
+                        <div class="flex items-center justify-between p-sm bg-surface-container-lowest/50 rounded-xl hover:bg-white/5 transition-all border border-white/5">
+                            <div class="flex items-center gap-md">
+                                <!-- Avatar via Background Sprite -->
+                                <div class="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-surface-container-highest shrink-0">
+                                    <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
+                                         :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-on-surface text-sm" x-text="p.name"></span>
+                                    <span class="block text-[10px] text-outline" x-text="`Score: ${p.score}`"></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-sm">
+                                <!-- Answer Status -->
+                                <span x-show="gameState.state === 'QUESTION_ACTIVE'" class="px-2 py-0.5 rounded text-[9px] font-label-bold"
+                                      :class="p.hasAnswered ? 'bg-secondary-fixed/10 text-secondary-fixed' : 'bg-white/5 text-outline-variant'"
+                                      x-text="p.hasAnswered ? 'ANSWERED' : 'THINKING...'">
+                                </span>
+                                <!-- Live indicator -->
+                                <span class="w-2 h-2 rounded-full bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)]"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Controller Action Buttons -->
+            <section class="flex flex-col items-center gap-sm shrink-0">
+                <!-- Lobby State -->
+                <button x-show="gameState.state === 'LOBBY'" @click="startGame()" :disabled="!gameState.players || gameState.players.length === 0" class="group relative w-full py-5 rounded-2xl bg-primary text-on-primary font-headline-sm text-lg active:scale-95 transition-all duration-150 neon-glow-primary overflow-hidden disabled:opacity-50">
+                    <div class="flex items-center justify-center gap-md relative z-10">
+                        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                        <span>START GAME</span>
+                    </div>
+                </button>
+
+                <!-- Intro State -->
+                <button x-show="gameState.state === 'QUESTION_INTRO'" disabled class="w-full py-5 rounded-2xl bg-surface-container-highest text-outline font-headline-sm text-lg">
+                    <div class="flex items-center justify-center gap-md">
+                        <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
+                        <span>GET READY...</span>
+                    </div>
+                </button>
+
+                <!-- Active Question State (Enforce Timer countdown) -->
+                <div x-show="gameState.state === 'QUESTION_ACTIVE'" class="w-full text-center py-4 bg-primary/10 border border-primary/20 rounded-xl">
+                    <p class="font-label-bold text-sm text-primary">QUESTION IS LIVE ON THE TV SCREEN</p>
+                    <p class="text-xs text-outline mt-1">Countdown timer and options are displayed casted. Waiting for submissions.</p>
+                </div>
+
+                <!-- Leaderboard State -->
+                <button x-show="gameState.state === 'QUESTION_LEADERBOARD'" @click="nextQuestion()" class="group relative w-full py-5 rounded-2xl bg-primary text-on-primary font-headline-sm text-lg active:scale-95 transition-all duration-150 neon-glow-primary overflow-hidden">
+                    <div class="flex items-center justify-center gap-md relative z-10">
+                        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">fast_forward</span>
+                        <span x-text="gameState.currentQuestionIndex + 1 === gameState.totalQuestions ? 'SHOW FINAL PODIUM' : 'NEXT QUESTION'"></span>
+                    </div>
+                </button>
+
+                <!-- Game Over State -->
+                <button x-show="gameState.state === 'GAME_OVER'" @click="playAgain()" class="group relative w-full py-5 rounded-2xl bg-secondary-fixed text-on-secondary font-headline-sm text-lg active:scale-95 transition-all duration-150 neon-glow-secondary overflow-hidden">
+                    <div class="flex items-center justify-center gap-md relative z-10">
+                        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">replay</span>
+                        <span>PLAY AGAIN</span>
+                    </div>
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <!-- BottomNavBar -->
+    <nav class="fixed bottom-0 left-0 w-full z-50 rounded-t-xl bg-surface-container-lowest/80 backdrop-blur-2xl shadow-[0_-8px_30px_rgb(0,0,0,0.5)] h-20 border-t border-white/5">
+        <div class="max-w-2xl mx-auto h-full flex justify-around items-center px-4">
+            <button class="flex flex-col items-center justify-center p-2 transition-all active:scale-90"
+                    :class="currentView === 'dashboard' ? 'text-primary font-bold' : 'text-outline hover:text-white'"
+                    @click="currentView = 'dashboard'">
+                <span class="material-symbols-outlined">library_books</span>
+                <span class="font-label-bold text-[9px] mt-1 uppercase tracking-wider">Library</span>
+            </button>
+            <button class="flex flex-col items-center justify-center p-2 transition-all active:scale-90"
+                    :class="currentView === 'editor' ? 'text-primary font-bold' : 'text-outline hover:text-white'"
+                    @click="openEditor()">
+                <span class="material-symbols-outlined">edit_document</span>
+                <span class="font-label-bold text-[9px] mt-1 uppercase tracking-wider">Edit</span>
+            </button>
+            <button class="flex flex-col items-center justify-center p-2 transition-all active:scale-90"
+                    :class="currentView === 'controller' ? 'text-primary font-bold' : 'text-outline hover:text-white'"
+                    @click="currentView = 'controller'">
+                <span class="material-symbols-outlined">sports_esports</span>
+                <span class="font-label-bold text-[9px] mt-1 uppercase tracking-wider">Controller</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Interactive JS Code -->
+    <script>
+        function hostAdmin() {
+            return {
+                socket: null,
+                currentView: 'dashboard', // dashboard, editor, controller
+                questions: [],
+                tempQuestions: [],
+                gameState: {},
+                quizList: [],
+                activeQuizFile: 'quiz.json',
+                init() {
+                    // Fetch existing quiz list and questions
+                    this.fetchQuizList();
+
+                    // Connect to Socket
+                    this.socket = io();
+
+                    this.socket.on('game-state', (state) => {
+                        this.gameState = state;
+                    });
+
+                    this.socket.on('timer-tick', (time) => {
+                        this.gameState.timeRemaining = time;
+                    });
+                },
+                fetchQuizList() {
+                    fetch('/api/quizzes')
+                        .then(r => r.json())
+                        .then(data => {
+                            this.quizList = data.quizzes;
+                            this.activeQuizFile = data.activeQuizFile;
+                            this.fetchQuiz();
+                        })
+                        .catch(err => console.error('Error fetching quiz list', err));
+                },
+                fetchQuiz() {
+                    fetch('/api/quiz')
+                        .then(r => r.json())
+                        .then(data => {
+                            this.questions = data;
+                        })
+                        .catch(err => console.error('Error fetching quiz', err));
+                },
+                selectQuiz(filename) {
+                    fetch('/api/quiz/select', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.fetchQuizList();
+                        }
+                    })
+                    .catch(err => console.error('Error selecting quiz', err));
+                },
+                createNewQuiz() {
+                    const name = prompt("Enter a name for the new quiz:");
+                    if (!name || !name.trim()) return;
+                    fetch('/api/quiz/new', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name.trim() })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.fetchQuizList();
+                            // Deep copy questions for the editor and switch to editor view
+                            this.tempQuestions = JSON.parse(JSON.stringify(data.questions));
+                            this.currentView = 'editor';
+                        } else {
+                            alert('Error creating quiz: ' + data.error);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error creating quiz', err);
+                        alert('Failed to create new quiz.');
+                    });
+                },
+                openEditor() {
+                    this.tempQuestions = JSON.parse(JSON.stringify(this.questions)); // Deep copy
+                    this.currentView = 'editor';
+                },
+                addQuestion() {
+                    this.tempQuestions.push({
+                        id: Date.now(),
+                        question: 'New Trivia Question',
+                        options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+                        correctIndex: 0,
+                        timeLimit: 20,
+                        image: ''
+                    });
+                },
+                uploadImage(event, question) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64Data = e.target.result;
+                        fetch('/api/upload', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: file.name,
+                                data: base64Data
+                            })
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                question.image = data.url;
+                            } else {
+                                alert('Upload failed: ' + data.error);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error uploading image', err);
+                            alert('Error uploading image');
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                },
+                removeQuestion(idx) {
+                    this.tempQuestions.splice(idx, 1);
+                },
+                saveQuiz() {
+                    fetch('/api/quiz', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.tempQuestions)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.questions = this.tempQuestions;
+                            this.fetchQuizList();
+                            this.currentView = 'dashboard';
+                        }
+                    })
+                    .catch(err => console.error('Error saving quiz', err));
+                },
+                launchLobby() {
+                    this.currentView = 'controller';
+                },
+                startGame() {
+                    this.socket.emit('start-game');
+                },
+                nextQuestion() {
+                    this.socket.emit('next-question');
+                },
+                playAgain() {
+                    this.socket.emit('play-again');
+                }
+            };
+        }
+    </script>
+</body>
+</html>
