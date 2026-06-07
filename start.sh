@@ -14,6 +14,33 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 MAGENTA='\033[0;35m'
 DIM='\033[2m'
+RED='\033[0;31m'
+
+# --- Shutdown handler ---
+shutdown() {
+    echo ""
+    echo -e "${RED}${BOLD}⛔ Shutting down QuizSpot...${RESET}"
+
+    # Kill the node server if it's running
+    if [ -n "$SERVER_PID" ] && kill -0 "$SERVER_PID" 2>/dev/null; then
+        kill "$SERVER_PID"
+        wait "$SERVER_PID" 2>/dev/null
+        echo -e "${GREEN}✔ Server stopped.${RESET}"
+    fi
+
+    # Release wake lock
+    if command -v termux-wake-unlock &>/dev/null; then
+        termux-wake-unlock
+        echo -e "${GREEN}✔ Wake lock released.${RESET}"
+    fi
+
+    echo -e "${DIM}Goodbye! 👋${RESET}"
+    echo ""
+    exit 0
+}
+
+# Trap Ctrl+C (SIGINT) and kill signals (SIGTERM)
+trap shutdown SIGINT SIGTERM
 
 clear
 
@@ -37,17 +64,31 @@ fi
 
 echo ""
 
-# --- Step 2: Get local IP ---
-IP=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+# --- Step 2: Get local IP (multiple fallbacks for Termux/Android) ---
 
-# Fallback: try hostname -I
+# Method 1: wlan0 interface (most common on Android)
+IP=$(ip addr show wlan0 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -1)
+
+# Method 2: any non-loopback, non-dummy IPv4 interface
+if [ -z "$IP" ]; then
+    IP=$(ip addr show 2>/dev/null \
+        | awk '/inet / && !/127\.0\.0\.1/ {print $2}' \
+        | cut -d/ -f1 | head -1)
+fi
+
+# Method 3: ip route src field
+if [ -z "$IP" ]; then
+    IP=$(ip route 2>/dev/null | awk '/src/ {print $NF}' | grep -v '^169\.' | head -1)
+fi
+
+# Method 4: hostname -I
 if [ -z "$IP" ]; then
     IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 fi
 
-# Final fallback
+# Give up
 if [ -z "$IP" ]; then
-    IP="<your-phone-ip>"
+    IP="<could-not-detect-ip>"
 fi
 
 HOST_URL="http://$IP:$PORT/host.html"
@@ -79,5 +120,9 @@ echo ""
 echo -e "${YELLOW}▶  Starting QuizSpot server... ${DIM}(Ctrl+C to stop)${RESET}"
 echo ""
 
-# --- Step 5: Start the server ---
-node server.js
+# --- Step 5: Start the server (in background so trap can catch Ctrl+C) ---
+node server.js &
+SERVER_PID=$!
+
+# Wait for the server process — the trap will fire on Ctrl+C
+wait $SERVER_PID
