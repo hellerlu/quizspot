@@ -64,31 +64,30 @@ fi
 
 echo ""
 
-# --- Step 2: Get local IP (multiple fallbacks for Termux/Android) ---
+# --- Step 2: Get local IP (supports both hotspot host and Wi-Fi client mode) ---
 
-# Method 1: wlan0 interface (most common on Android)
-IP=$(ip addr show wlan0 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -1)
+# Grab all non-loopback, non-link-local IPv4 addresses across all interfaces
+ALL_IPS=$(ip addr show 2>/dev/null \
+    | awk '/inet / {print $2}' \
+    | cut -d/ -f1 \
+    | grep -v '^127\.' \
+    | grep -v '^169\.254\.')
 
-# Method 2: any non-loopback, non-dummy IPv4 interface
+# Prefer the Android hotspot gateway range (192.168.43.x or 192.168.0.x)
+IP=$(echo "$ALL_IPS" | grep -E '^192\.168\.(43|0|1|2|4|8)\.' | head -1)
+
+# Fallback: any remaining address
 if [ -z "$IP" ]; then
-    IP=$(ip addr show 2>/dev/null \
-        | awk '/inet / && !/127\.0\.0\.1/ {print $2}' \
-        | cut -d/ -f1 | head -1)
+    IP=$(echo "$ALL_IPS" | head -1)
 fi
 
-# Method 3: ip route src field
+# Final fallback: ask the user
 if [ -z "$IP" ]; then
-    IP=$(ip route 2>/dev/null | awk '/src/ {print $NF}' | grep -v '^169\.' | head -1)
-fi
-
-# Method 4: hostname -I
-if [ -z "$IP" ]; then
-    IP=$(hostname -I 2>/dev/null | awk '{print $1}')
-fi
-
-# Give up
-if [ -z "$IP" ]; then
-    IP="<could-not-detect-ip>"
+    echo -e "${YELLOW}⚠  Could not detect IP automatically.${RESET}"
+    echo -e "${DIM}   Run 'ip addr show' to find it, or check your hotspot settings.${RESET}"
+    echo -e "${DIM}   Android hotspot IP is usually: 192.168.43.1${RESET}"
+    echo -ne "${BOLD}   Enter your IP manually: ${RESET}"
+    read -r IP
 fi
 
 HOST_URL="http://$IP:$PORT/host.html"
