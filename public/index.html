@@ -16,7 +16,7 @@
         body {
             overscroll-behavior: none;
             -webkit-tap-highlight-color: transparent;
-            min-height: max(884px, 100dvh);
+            min-height: 100dvh;
             background-color: #10131b;
             color: #e0e2ed;
         }
@@ -85,14 +85,14 @@
     </div>
 
     <!-- Top App Bar -->
-    <header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-xs" x-show="clientState !== 'question_feedback'">
+    <header class="fixed top-0 w-full z-50 bg-surface/10 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-gutter-mobile py-sm" x-show="clientState !== 'question_feedback'">
         <div class="flex items-center gap-sm">
             <span class="material-symbols-outlined text-primary text-xl">grid_view</span>
             <h1 class="font-display-mobile text-headline-sm text-primary tracking-tighter italic leading-none">QuizSpot</h1>
         </div>
-        <div class="flex items-center gap-md">
-            <div class="bg-surface-container-high px-sm py-xs rounded-lg border border-outline-variant" x-show="gameState.pin">
-                <span class="text-xs font-label-bold text-outline">PIN: <span x-text="gameState.pin"></span></span>
+        <div class="flex items-center gap-base">
+            <div class="bg-surface-container-high px-sm py-1 rounded-lg border border-outline-variant whitespace-nowrap" x-show="gameState.pin">
+                <span class="text-xs font-label-bold text-outline">PIN: <span class="text-white font-black" x-text="gameState.pin"></span></span>
             </div>
             <!-- Player Avatar via Background Sprite -->
             <div class="w-8 h-8 rounded-full border-2 border-primary overflow-hidden bg-surface-container-highest shrink-0" 
@@ -104,7 +104,7 @@
     </header>
 
     <!-- MAIN VIEWS CONTAINER -->
-    <main class="relative z-10 flex flex-col items-center justify-center w-full max-w-[480px] min-h-screen px-gutter-mobile pt-16 pb-20">
+    <main class="relative z-10 flex flex-col items-center justify-center w-full max-w-[480px] min-h-[100dvh] px-gutter-mobile pt-16 pb-20">
 
         <!-- 1. JOIN VIEW -->
         <div x-show="clientState === 'join'" class="w-full space-y-md flex flex-col items-center">
@@ -187,15 +187,15 @@
             <div class="relative w-24 h-24 mb-sm">
                 <div class="absolute inset-0 bg-primary/20 rounded-2xl rotate-45 animate-spin duration-3000"></div>
                 <div class="absolute inset-2 glass-panel rounded-xl flex items-center justify-center z-10">
-                    <span class="material-symbols-outlined text-secondary-fixed text-5xl">timer</span>
+                    <span class="font-display-mobile text-secondary-fixed text-3xl font-black" x-text="gameState.timeRemaining"></span>
                 </div>
             </div>
             <h2 class="font-display-mobile text-4xl text-on-surface">Get Ready!</h2>
-            <p class="font-body-lg text-outline">Look at the TV screen for the question.</p>
+            <p class="font-body-lg text-outline" x-text="`Question starts in ${gameState.timeRemaining}s...`"></p>
         </div>
 
         <!-- 4. KEYPAD / CONTROLLER -->
-        <div x-show="clientState === 'question_active'" class="w-full h-[70vh] flex flex-col gap-4">
+        <div x-show="clientState === 'question_active'" class="w-full h-[65dvh] flex flex-col gap-4">
             <div class="flex justify-between items-center bg-surface-container/40 backdrop-blur-md p-3 rounded-xl border border-white/5 shrink-0">
                 <div class="flex flex-col">
                     <span class="text-outline font-label-bold text-[10px] uppercase tracking-widest">Active Question</span>
@@ -301,7 +301,7 @@
         </div>
 
         <!-- 6. FEEDBACK VIEW -->
-        <div x-show="clientState === 'question_feedback'" class="fixed inset-0 z-40 w-screen h-screen flex flex-col items-center justify-center text-center px-gutter-mobile bg-[#10131b]">
+        <div x-show="clientState === 'question_feedback'" class="fixed inset-0 z-40 w-screen h-[100dvh] flex flex-col items-center justify-center text-center px-gutter-mobile bg-[#10131b]">
             
             <!-- Vignette Effects -->
             <div class="fixed inset-0 pointer-events-none" :class="lastAnswerCorrect ? 'vignette-success' : 'vignette-error'"></div>
@@ -309,41 +309,47 @@
             <!-- Massive Feedback Content -->
             <div class="z-10 flex flex-col items-center text-center px-gutter-mobile w-full">
                 <!-- Icon -->
-                <div class="mb-lg" :class="lastAnswerCorrect ? 'success-glow' : 'error-glow shake-impact'">
-                    <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-8 flex items-center justify-center animate-pulse"
+                <div class="mb-md" :class="lastAnswerCorrect ? 'success-glow' : 'error-glow shake-impact'">
+                    <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-8 flex items-center justify-center animate-pulse"
                          :class="lastAnswerCorrect ? 'border-secondary-fixed text-secondary-fixed' : 'border-error text-error'">
-                        <span class="material-symbols-outlined text-[80px] md:text-[120px]"
+                        <span class="material-symbols-outlined text-[64px] md:text-[80px]"
                               x-text="lastAnswerCorrect ? 'check' : 'close'">
                         </span>
                     </div>
                 </div>
 
                 <!-- High Impact Headline -->
-                <h1 class="font-display-mobile text-[56px] tracking-tighter italic mb-xs drop-shadow-lg"
+                <h1 class="font-display-mobile text-[44px] md:text-[56px] tracking-tighter italic mb-xs drop-shadow-lg"
                     :class="lastAnswerCorrect ? 'text-secondary-fixed' : 'text-error'"
                     x-text="lastAnswerCorrect ? 'CORRECT!' : 'INCORRECT!'">
                 </h1>
 
                 <!-- Points Awarded Glass Card -->
-                <div class="glass-panel rounded-xl px-lg py-md mb-lg w-full max-w-[380px] shadow-2xl">
-                    <p class="font-label-bold text-label-bold text-outline-variant mb-xs uppercase tracking-widest">Points Gained</p>
-                    <p class="font-headline-sm text-headline-sm text-white font-bold"
+                <div class="glass-panel rounded-xl px-md py-sm mb-md w-full max-w-[340px] shadow-2xl">
+                    <p class="font-label-bold text-label-bold text-outline-variant mb-xs uppercase tracking-widest text-[10px]">Points Gained</p>
+                    <p class="font-headline-sm text-headline-sm text-white font-bold text-lg"
                        x-text="lastAnswerCorrect ? `+${scoreChange} Points` : 'Better luck next time!'">
                     </p>
                 </div>
 
                 <!-- Total Score -->
                 <div class="flex flex-col items-center">
-                    <p class="font-label-bold text-label-bold text-white opacity-70 uppercase tracking-widest mb-1">
+                    <p class="font-label-bold text-label-bold text-white opacity-70 uppercase tracking-widest mb-1 text-[10px]">
                         Current Score
                     </p>
-                    <p class="font-headline-md text-headline-md text-white font-extrabold" x-text="currentScore"></p>
+                    <p class="font-headline-md text-headline-md text-white font-extrabold text-2xl" x-text="currentScore"></p>
                 </div>
 
                 <!-- Correct Answer Reveal (For Incorrect State) -->
-                <div class="mt-lg opacity-80" x-show="!lastAnswerCorrect">
+                <div class="mt-md opacity-80" x-show="!lastAnswerCorrect">
                     <p class="font-body-md text-body-md italic text-outline-variant">
-                        The correct answer was: <span class="font-bold text-secondary-fixed" x-text="gameState.currentQuestion && gameState.currentQuestion.correctIndex !== null ? gameState.currentQuestion.options[gameState.currentQuestion.correctIndex] : ''"></span>
+                        The correct answer was: <span class="font-bold" :class="[
+                            gameState.currentQuestion?.correctIndex === 0 ? 'text-[#ff003c]' : '',
+                            gameState.currentQuestion?.correctIndex === 1 ? 'text-[#00a2ff]' : '',
+                            gameState.currentQuestion?.correctIndex === 2 ? 'text-[#ffd600]' : '',
+                            gameState.currentQuestion?.correctIndex === 3 ? 'text-[#2ae500]' : '',
+                            gameState.currentQuestion?.correctIndex === null ? 'text-secondary-fixed' : ''
+                        ]" x-text="gameState.currentQuestion && gameState.currentQuestion.correctIndex !== null ? gameState.currentQuestion.options[gameState.currentQuestion.correctIndex] : ''"></span>
                     </p>
                 </div>
             </div>

@@ -216,14 +216,24 @@
             <span class="px-md py-xs rounded-lg glass-panel text-primary font-label-bold uppercase tracking-widest text-xs"
                   x-text="`Question ${gameState.currentQuestionIndex + 1} of ${gameState.totalQuestions}`"></span>
             
-            <h2 class="font-display-tv text-headline-lg text-on-surface max-w-5xl mx-auto leading-tight italic"
+            <h2 class="font-display-tv text-on-surface max-w-5xl mx-auto leading-tight italic transition-all duration-300"
+                :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-lg-mobile lg:text-[28px]' : 'text-headline-lg-mobile lg:text-headline-lg'"
                 x-text="gameState.currentQuestion ? gameState.currentQuestion.question : ''"></h2>
 
-            <div class="pt-lg flex flex-col items-center gap-sm">
-                <div class="relative w-24 h-24 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20">
-                    <span class="material-symbols-outlined text-primary text-5xl animate-bounce">sports_esports</span>
+            <!-- Central visual / Image (only shown when a question has an image) -->
+            <template x-if="gameState.currentQuestion && gameState.currentQuestion.image">
+                <section class="w-full max-w-4xl px-md mb-sm flex-grow flex items-center justify-center">
+                    <div class="w-full max-w-3xl aspect-video rounded-2xl overflow-hidden border-2 border-primary/20 neon-glow-primary bg-surface-container-low/50 relative flex items-center justify-center">
+                        <img :src="gameState.currentQuestion.image" class="w-full h-full object-contain">
+                    </div>
+                </section>
+            </template>
+
+            <div class="pt-sm flex flex-col items-center gap-sm">
+                <div class="relative w-24 h-24 rounded-full flex items-center justify-center bg-primary/10 border-2 border-primary/30 neon-glow-primary">
+                    <span class="font-display-tv text-primary text-4xl font-extrabold" x-text="gameState.timeRemaining"></span>
                 </div>
-                <p class="font-label-bold text-secondary-fixed text-lg animate-pulse">GET READY TO ANSWER ON YOUR CONTROLLER!</p>
+                <p class="font-label-bold text-secondary-fixed text-lg animate-pulse" x-text="`GET READY... QUESTION BEGINS IN ${gameState.timeRemaining}s`"></p>
             </div>
         </div>
 

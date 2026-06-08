@@ -219,7 +219,8 @@ let gameSession = {
     players: {}, // socketId -> { id, name, avatar, score, lastAnswerCorrect, scoreChange, answerIndex, answerTime }
     questionStartTime: 0,
     timerId: null,
-    timeRemaining: 0
+    timeRemaining: 0,
+    getReadyDuration: 4 // default transition time in seconds
 };
 
 // Load initial quiz
@@ -266,7 +267,8 @@ function broadcastState() {
         leaderboard: leaderboard,
         timeRemaining: gameSession.timeRemaining,
         hostIP: getLocalIP(),
-        hostPort: PORT
+        hostPort: PORT,
+        getReadyDuration: gameSession.getReadyDuration
     };
 
     if (gameSession.currentQuestionIndex >= 0 && gameSession.currentQuestionIndex < gameSession.questions.length) {
@@ -336,8 +338,50 @@ function startTimer(seconds) {
     }, 1000);
 }
 
+function startIntroTimer(seconds) {
+    if (gameSession.timerId) {
+        clearInterval(gameSession.timerId);
+    }
+    gameSession.timeRemaining = seconds;
+    broadcastState();
+
+    gameSession.timerId = setInterval(() => {
+        gameSession.timeRemaining--;
+        if (gameSession.timeRemaining <= 0) {
+            clearInterval(gameSession.timerId);
+            gameSession.timerId = null;
+            startActiveQuestion();
+        } else {
+            io.emit('timer-tick', gameSession.timeRemaining);
+        }
+    }, 1000);
+}
+
+function startActiveQuestion() {
+    gameSession.state = 'QUESTION_ACTIVE';
+    gameSession.questionStartTime = Date.now();
+    
+    // Reset answer markers
+    Object.keys(gameSession.players).forEach(socketId => {
+        const player = gameSession.players[socketId];
+        player.answerIndex = null;
+        player.answerTime = null;
+    });
+
+    const q = gameSession.questions[gameSession.currentQuestionIndex];
+    startTimer(q.timeLimit);
+}
+
 io.on('connection', (socket) => {
     console.log(`Socket connected: ${socket.id}`);
+
+    // Update session settings
+    socket.on('update-settings', ({ getReadyDuration }) => {
+        if (typeof getReadyDuration === 'number') {
+            gameSession.getReadyDuration = Math.max(1, Math.min(10, getReadyDuration));
+            broadcastState();
+        }
+    });
 
     // Send current game state upon connection
     socket.emit('init-state', {
@@ -414,23 +458,7 @@ io.on('connection', (socket) => {
 
         gameSession.currentQuestionIndex = 0;
         gameSession.state = 'QUESTION_INTRO';
-        broadcastState();
-
-        // 4 seconds transition count down before question goes active
-        setTimeout(() => {
-            gameSession.state = 'QUESTION_ACTIVE';
-            gameSession.questionStartTime = Date.now();
-            
-            // Reset answer markers
-            Object.keys(gameSession.players).forEach(socketId => {
-                const player = gameSession.players[socketId];
-                player.answerIndex = null;
-                player.answerTime = null;
-            });
-
-            const q = gameSession.questions[gameSession.currentQuestionIndex];
-            startTimer(q.timeLimit);
-        }, 4000);
+        startIntroTimer(gameSession.getReadyDuration);
     });
 
     socket.on('next-question', () => {
@@ -439,21 +467,7 @@ io.on('connection', (socket) => {
         if (gameSession.currentQuestionIndex + 1 < gameSession.questions.length) {
             gameSession.currentQuestionIndex++;
             gameSession.state = 'QUESTION_INTRO';
-            broadcastState();
-
-            setTimeout(() => {
-                gameSession.state = 'QUESTION_ACTIVE';
-                gameSession.questionStartTime = Date.now();
-                
-                Object.keys(gameSession.players).forEach(socketId => {
-                    const player = gameSession.players[socketId];
-                    player.answerIndex = null;
-                    player.answerTime = null;
-                });
-
-                const q = gameSession.questions[gameSession.currentQuestionIndex];
-                startTimer(q.timeLimit);
-            }, 4000);
+            startIntroTimer(gameSession.getReadyDuration);
         } else {
             gameSession.state = 'GAME_OVER';
             broadcastState();

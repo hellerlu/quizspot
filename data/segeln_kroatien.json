@@ -1,0 +1,125 @@
+[
+  {
+    "id": 1,
+    "question": "Welcher gefährliche Wind in Kroatien weht oft plötzlich, sehr böig und aus nordöstlicher Richtung von den Bergen herab?",
+    "options": [
+      "Jugo",
+      "Maestral",
+      "Bora (Bura)",
+      "Tramontana"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 2,
+    "question": "Welches Boot muss in dieser Situation ausweichen? (Boot A hat Wind von Steuerbord, Boot B hat Wind von Backbord.)",
+    "options": [
+      "Boot A (Wind von Steuerbord)",
+      "Boot B (Wind von Backbord)",
+      "Keines, es gilt rechts vor links",
+      "Das größere Boot hat immer Vorfahrt"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 30,
+    "image": "/assets/sailing/wind_crossing.png"
+  },
+  {
+    "id": 3,
+    "question": "Beim römisch-katholischen Anlegen (Heck zum Steg) in einer kroatischen Marina: Wo wird die Muringleine (Mooring) befestigt?",
+    "options": [
+      "Am Heck des Schiffes",
+      "Am Bug des Schiffes (wird stramm durchgesetzt)",
+      "Mittschiffs als Spring",
+      "Sie wird im Wasser treiben gelassen"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 20
+  },
+  {
+    "id": 4,
+    "question": "Wie befestigen Sie Ihre Festmacherleine korrekt an einer kroatischen Boje, um Scheuern zu verhindern und sicher zu liegen?",
+    "options": [
+      "Nur am oberen Ring der Boje verknoten",
+      "Durch das Auge unterhalb des Bojenkörpers (am Metallstab) ziehen und zurück an Bord führen",
+      "Die Leine einmal komplett um den Plastikkörper der Boje wickeln",
+      "Das Boot mit dem Heck an der Boje festmachen"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 20
+  },
+  {
+    "id": 5,
+    "question": "Warum sollte man bei einem Katamaran vor Anker immer eine Hahnepot (Bridle) verwenden?",
+    "options": [
+      "Um die Motoren vor dem Auskühlen zu schützen",
+      "Um den Anker tiefer in den Sand zu treiben",
+      "Um Zugkräfte auf beide Rümpfe zu verteilen, das Schwojen zu verringern und die Ankerwinde zu entlasten",
+      "Um Kollisionen mit dem Beiboot zu verhindern"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 6,
+    "question": "Beide Segelboote segeln auf gleichem Kurs mit Wind von Backbord. Boot A ist luvwärts (näher zum Wind), Boot B leewärts. Wer muss ausweichen?",
+    "options": [
+      "Boot B (Lee-Boot) muss ausweichen",
+      "Boot A (Luv-Boot) muss ausweichen, da \"Luv weicht Lee\" gilt",
+      "Wer schneller segelt, hat Vorfahrt",
+      "Beide müssen gleichzeitig nach Steuerbord ausweichen"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 30,
+    "image": "/assets/sailing/windward_leeward.png"
+  },
+  {
+    "id": 7,
+    "question": "Welcher Abstand muss in Kroatien beim freien Ankern zu konzessionierten Bojenfeldern in der Regel mindestens eingehalten werden?",
+    "options": [
+      "Mindestens 50 Meter",
+      "Mindestens 150 Meter",
+      "Es gibt keinen Mindestabstand",
+      "Mindestens 1 Seemeile"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 25
+  },
+  {
+    "id": 8,
+    "question": "Sie sehen auf dem Wasser dieses Kardinalzeichen (zwei Kegel zeigen zueinander, gelb-schwarz-gelb). Um welches Zeichen handelt es sich?",
+    "options": [
+      "Nord-Kardinalzeichen – im Norden passieren",
+      "Ost-Kardinalzeichen – im Osten passieren",
+      "West-Kardinalzeichen – im Westen passieren",
+      "Süd-Kardinalzeichen – im Süden passieren"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 30,
+    "image": "/assets/sailing/west_cardinal.png"
+  },
+  {
+    "id": 9,
+    "question": "Welcher Wind bringt in Kroatien meist warmes, feuchtes Wetter, einen bedeckten Himmel, Regen und hohen Seegang aus südöstlicher Richtung?",
+    "options": [
+      "Bora",
+      "Maestral",
+      "Jugo (Schirokko)",
+      "Nevera"
+    ],
+    "correctIndex": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 10,
+    "question": "Auf welchem UKW-Kanal (VHF) müssen Sie in Kroatien (und weltweit) den Seenotruf (Mayday) senden bzw. die Standard-Hörwache halten?",
+    "options": [
+      "Kanal 12",
+      "Kanal 16",
+      "Kanal 69",
+      "Kanal 72"
+    ],
+    "correctIndex": 1,
+    "timeLimit": 20
+  }
+]

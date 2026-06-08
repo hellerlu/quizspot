@@ -134,6 +134,36 @@
                     </template>
                 </div>
 
+                <div class="h-px bg-white/10 w-full my-sm"></div>
+
+                <!-- Game Settings -->
+                <div class="flex flex-col gap-xs pb-sm">
+                    <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Game Options</label>
+                    <div class="flex items-center justify-between p-sm bg-surface-container-lowest/50 rounded-xl border border-white/5">
+                        <div class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-primary">hourglass_empty</span>
+                            <div>
+                                <span class="text-xs font-bold text-on-surface">"Get Ready" Countdown</span>
+                                <span class="block text-[10px] text-outline">Duration before a question becomes active</span>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <select x-model.number="getReadyDuration" @change="updateGetReadyDuration()" class="pl-3 pr-8 py-1.5 bg-[#1e2330] border border-white/10 rounded-lg text-on-surface font-label-bold focus:outline-none focus:border-primary/50 text-xs">
+                                <option value="1">1 Second</option>
+                                <option value="2">2 Seconds</option>
+                                <option value="3">3 Seconds</option>
+                                <option value="4">4 Seconds</option>
+                                <option value="5">5 Seconds</option>
+                                <option value="6">6 Seconds</option>
+                                <option value="7">7 Seconds</option>
+                                <option value="8">8 Seconds</option>
+                                <option value="9">9 Seconds</option>
+                                <option value="10">10 Seconds</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pt-sm">
                     <button @click="launchLobby()" class="w-full bg-primary text-on-primary font-headline-sm text-base py-5 rounded-2xl active:scale-95 transition-all duration-150 neon-glow-primary flex items-center justify-center gap-md group">
                         <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">sensors</span>
@@ -354,7 +384,7 @@
                 <button x-show="gameState.state === 'QUESTION_INTRO'" disabled class="w-full py-5 rounded-2xl bg-surface-container-highest text-outline font-headline-sm text-lg">
                     <div class="flex items-center justify-center gap-md">
                         <span class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
-                        <span>GET READY...</span>
+                        <span x-text="`GET READY... (${gameState.timeRemaining}s)`"></span>
                     </div>
                 </button>
 
@@ -418,6 +448,7 @@
                 gameState: {},
                 quizList: [],
                 activeQuizFile: 'quiz.json',
+                getReadyDuration: 4,
                 init() {
                     // Fetch existing quiz list and questions
                     this.fetchQuizList();
@@ -427,6 +458,9 @@
 
                     this.socket.on('game-state', (state) => {
                         this.gameState = state;
+                        if (state.getReadyDuration !== undefined) {
+                            this.getReadyDuration = state.getReadyDuration;
+                        }
                     });
 
                     this.socket.on('timer-tick', (time) => {
@@ -563,6 +597,9 @@
                 },
                 playAgain() {
                     this.socket.emit('play-again');
+                },
+                updateGetReadyDuration() {
+                    this.socket.emit('update-settings', { getReadyDuration: this.getReadyDuration });
                 }
             };
         }
