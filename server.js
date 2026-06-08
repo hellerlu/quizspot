@@ -528,7 +528,8 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
     console.log(`=========================================`);
     console.log(` QuizSpot Server Running Offline!`);
-    console.log(` Host URL: http://localhost:${PORT}`);
-    console.log(` Player/TV URL: http://${getLocalIP()}:${PORT}`);
+    console.log(` Host URL:   http://localhost:${PORT}/host.html`);
+    console.log(` TV URL:     http://${getLocalIP()}:${PORT}/tv.html`);
+    console.log(` Player URL: http://${getLocalIP()}:${PORT}/`);
     console.log(`=========================================`);
 });
