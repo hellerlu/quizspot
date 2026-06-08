@@ -138,7 +138,9 @@
 
         <!-- 1. LOBBY VIEW -->
         <div x-show="gameState.state === 'LOBBY'" class="flex-grow flex flex-col justify-around">
-            <div class="grid grid-cols-12 gap-lg items-center mt-4">
+            
+            <!-- Default Layout (No Wi-Fi configured) -->
+            <div x-show="!gameState.wifi || !gameState.wifi.ssid" class="grid grid-cols-12 gap-lg items-center mt-4">
                 <!-- Left Side: Instructions & QR Info -->
                 <div class="col-span-5 flex flex-col gap-lg items-start">
                     <div class="space-y-sm">
@@ -163,7 +165,7 @@
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
-                            <canvas id="lobby-qr" class="w-64 h-64 md:w-80 md:h-80"></canvas>
+                            <canvas id="lobby-qr-default" class="w-64 h-64 md:w-80 md:h-80"></canvas>
                         </div>
                     </div>
                 </div>
@@ -184,7 +186,72 @@
                 </div>
             </div>
 
-            <!-- Player Lobby Chips â€” Dynamic flex-wrap so cards size to name length -->
+            <!-- Wi-Fi Enabled Layout (SSID configured) -->
+            <div x-show="gameState.wifi && gameState.wifi.ssid" class="grid grid-cols-12 gap-md items-center mt-4">
+                <!-- Step 1: Wi-Fi Hotspot Connect -->
+                <div class="col-span-5 flex flex-col gap-md items-center text-center">
+                    <div class="space-y-xs">
+                        <span class="px-3 py-1 rounded bg-[#adc7ff]/10 text-primary font-label-bold text-xs uppercase tracking-wider">Step 1: Connect to Hotspot</span>
+                        <h2 class="text-2xl text-on-surface font-extrabold tracking-tight">Scan for Wi-Fi</h2>
+                    </div>
+                    <div class="relative animate-float">
+                        <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
+                        <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-primary">
+                            <canvas id="wifi-qr" class="w-48 h-48 md:w-56 md:h-56"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-label-bold text-outline">SSID Name:</span>
+                            <span class="font-bold text-white font-mono" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
+                        </div>
+                        <div class="h-px bg-white/5 w-full"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-label-bold text-outline">Password:</span>
+                            <span class="font-bold text-white font-mono" x-text="gameState.wifi ? gameState.wifi.password : ''"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Game Connection -->
+                <div class="col-span-5 flex flex-col gap-md items-center text-center">
+                    <div class="space-y-xs">
+                        <span class="px-3 py-1 rounded bg-[#79ff5b]/10 text-secondary-fixed font-label-bold text-xs uppercase tracking-wider">Step 2: Enter Arena</span>
+                        <h2 class="text-2xl text-on-surface font-extrabold tracking-tight">Scan to Join Game</h2>
+                    </div>
+                    <div class="relative animate-float" style="animation-delay: 0.5s;">
+                        <div class="absolute -inset-4 bg-secondary-fixed/10 blur-3xl rounded-full"></div>
+                        <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
+                            <canvas id="lobby-qr-wifi" class="w-48 h-48 md:w-56 md:h-56"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-label-bold text-outline">Join at:</span>
+                            <span class="font-bold text-white truncate max-w-[180px]" x-text="`${gameState.hostIP}:${gameState.hostPort}`"></span>
+                        </div>
+                        <div class="h-px bg-white/5 w-full"></div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-label-bold text-outline">PIN Code:</span>
+                            <span class="font-bold text-secondary-fixed font-mono" x-text="gameState.pin"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Stats Card -->
+                <div class="col-span-2 flex flex-col gap-md">
+                    <div class="glass-panel p-md rounded-2xl flex flex-col items-center justify-center text-center gap-xs">
+                        <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-widest">Players</span>
+                        <span class="font-display-tv text-headline-lg text-secondary-fixed font-black leading-none" x-text="gameState.players ? gameState.players.length : 0"></span>
+                    </div>
+                    <div class="glass-panel p-sm rounded-xl flex flex-col items-center text-center gap-xs">
+                        <span class="material-symbols-outlined text-primary text-xl">sports_esports</span>
+                        <span class="font-headline-sm text-xs font-bold text-on-surface line-clamp-2" x-text="gameState.quizName || 'General Trivia'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Lobby Chips -->
             <div class="mt-8 overflow-y-auto px-4 -mx-4 py-4 -my-4 no-scrollbar">
                 <div class="flex items-center justify-between mb-sm border-b border-white/5 pb-2 px-1">
                     <h3 class="font-headline-sm text-headline-sm text-outline">Player Lobby</h3>
@@ -615,12 +682,44 @@
                         // Trigger QR generation when IP is set
                         if (state.hostIP) {
                             const joinUrl = `http://${state.hostIP}:${state.hostPort}/?pin=${state.pin}`;
-                            new QRious({
-                                element: document.getElementById('lobby-qr'),
-                                value: joinUrl,
-                                size: 300,
-                                background: 'white',
-                                foreground: '#10131b'
+                            
+                            this.$nextTick(() => {
+                                // Default layout game QR
+                                const defaultEl = document.getElementById('lobby-qr-default');
+                                if (defaultEl) {
+                                    new QRious({
+                                        element: defaultEl,
+                                        value: joinUrl,
+                                        size: 300,
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                }
+                                
+                                // Wifi layout game QR
+                                const wifiJoinEl = document.getElementById('lobby-qr-wifi');
+                                if (wifiJoinEl) {
+                                    new QRious({
+                                        element: wifiJoinEl,
+                                        value: joinUrl,
+                                        size: 300,
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                }
+                                
+                                // Wifi network connect QR
+                                const wifiNetEl = document.getElementById('wifi-qr');
+                                if (wifiNetEl && state.wifi && state.wifi.ssid) {
+                                    const wifiString = `WIFI:S:${state.wifi.ssid};T:${state.wifi.security};P:${state.wifi.password};;`;
+                                    new QRious({
+                                        element: wifiNetEl,
+                                        value: wifiString,
+                                        size: 300,
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                }
                             });
                         }
 

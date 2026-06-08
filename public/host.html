@@ -137,7 +137,7 @@
                 <div class="h-px bg-white/10 w-full my-sm"></div>
 
                 <!-- Game Settings -->
-                <div class="flex flex-col gap-xs pb-sm">
+                <div class="flex flex-col gap-xs pb-sm space-y-sm">
                     <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Game Options</label>
                     <div class="flex items-center justify-between p-sm bg-surface-container-lowest/50 rounded-xl border border-white/5">
                         <div class="flex items-center gap-sm">
@@ -160,6 +160,24 @@
                                 <option value="9">9 Seconds</option>
                                 <option value="10">10 Seconds</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Hotspot Wi-Fi Settings -->
+                    <div class="flex flex-col gap-xs pb-sm border-t border-white/5 pt-sm mt-xs">
+                        <label class="text-[10px] font-label-bold text-outline uppercase tracking-wider px-1">Hotspot Wi-Fi (Termux/Offline Mode)</label>
+                        <div class="glass-panel p-sm rounded-xl border border-white/5 space-y-sm bg-surface-container-lowest/20">
+                            <p class="text-[10px] text-outline px-1">Configure your phone's Wi-Fi hotspot details so players can connect instantly via QR code.</p>
+                            <div class="grid grid-cols-2 gap-sm">
+                                <div class="space-y-xs">
+                                    <label class="text-[9px] font-label-bold text-outline uppercase px-1">Wi-Fi SSID (Network Name)</label>
+                                    <input type="text" x-model="wifiSSID" @input="updateWifiSettings()" class="w-full px-3 py-1.5 bg-[#1e2330] border border-white/10 rounded-lg text-on-surface font-label-bold focus:outline-none focus:border-primary/50 text-xs" placeholder="e.g. MyHotspot">
+                                </div>
+                                <div class="space-y-xs">
+                                    <label class="text-[9px] font-label-bold text-outline uppercase px-1">Password</label>
+                                    <input type="text" x-model="wifiPassword" @input="updateWifiSettings()" class="w-full px-3 py-1.5 bg-[#1e2330] border border-white/10 rounded-lg text-on-surface font-label-bold focus:outline-none focus:border-primary/50 text-xs" placeholder="e.g. 12345678">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -449,6 +467,9 @@
                 quizList: [],
                 activeQuizFile: 'quiz.json',
                 getReadyDuration: 4,
+                wifiSSID: '',
+                wifiPassword: '',
+                wifiSecurity: 'WPA',
                 init() {
                     // Fetch existing quiz list and questions
                     this.fetchQuizList();
@@ -460,6 +481,11 @@
                         this.gameState = state;
                         if (state.getReadyDuration !== undefined) {
                             this.getReadyDuration = state.getReadyDuration;
+                        }
+                        if (state.wifi) {
+                            this.wifiSSID = state.wifi.ssid || '';
+                            this.wifiPassword = state.wifi.password || '';
+                            this.wifiSecurity = state.wifi.security || 'WPA';
                         }
                     });
 
@@ -600,6 +626,15 @@
                 },
                 updateGetReadyDuration() {
                     this.socket.emit('update-settings', { getReadyDuration: this.getReadyDuration });
+                },
+                updateWifiSettings() {
+                    this.socket.emit('update-settings', {
+                        wifi: {
+                            ssid: this.wifiSSID,
+                            password: this.wifiPassword,
+                            security: this.wifiSecurity
+                        }
+                    });
                 }
             };
         }

@@ -220,7 +220,12 @@ let gameSession = {
     questionStartTime: 0,
     timerId: null,
     timeRemaining: 0,
-    getReadyDuration: 4 // default transition time in seconds
+    getReadyDuration: 4, // default transition time in seconds
+    wifi: {
+        ssid: '',
+        password: '',
+        security: 'WPA'
+    }
 };
 
 // Load initial quiz
@@ -268,7 +273,8 @@ function broadcastState() {
         timeRemaining: gameSession.timeRemaining,
         hostIP: getLocalIP(),
         hostPort: PORT,
-        getReadyDuration: gameSession.getReadyDuration
+        getReadyDuration: gameSession.getReadyDuration,
+        wifi: gameSession.wifi
     };
 
     if (gameSession.currentQuestionIndex >= 0 && gameSession.currentQuestionIndex < gameSession.questions.length) {
@@ -376,9 +382,18 @@ io.on('connection', (socket) => {
     console.log(`Socket connected: ${socket.id}`);
 
     // Update session settings
-    socket.on('update-settings', ({ getReadyDuration }) => {
-        if (typeof getReadyDuration === 'number') {
-            gameSession.getReadyDuration = Math.max(1, Math.min(10, getReadyDuration));
+    socket.on('update-settings', (settings) => {
+        if (settings) {
+            if (typeof settings.getReadyDuration === 'number') {
+                gameSession.getReadyDuration = Math.max(1, Math.min(10, settings.getReadyDuration));
+            }
+            if (settings.wifi) {
+                gameSession.wifi = {
+                    ssid: typeof settings.wifi.ssid === 'string' ? settings.wifi.ssid.trim() : '',
+                    password: typeof settings.wifi.password === 'string' ? settings.wifi.password.trim() : '',
+                    security: typeof settings.wifi.security === 'string' ? settings.wifi.security : 'WPA'
+                };
+            }
             broadcastState();
         }
     });
