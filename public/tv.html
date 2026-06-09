@@ -165,7 +165,7 @@
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
-                            <canvas id="lobby-qr-default" class="w-80 h-80 md:w-96 md:h-96"></canvas>
+                            <canvas id="lobby-qr-default" class="w-[320px] h-[320px] md:w-[460px] md:h-[460px]"></canvas>
                         </div>
                     </div>
                 </div>
@@ -196,11 +196,11 @@
                     </div>
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
-                        <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-primary">
-                            <canvas id="wifi-qr" class="w-56 h-56 md:w-64 md:h-64"></canvas>
+                        <div class="relative bg-white p-6 rounded-2xl shadow-xl neon-glow-primary">
+                            <canvas id="wifi-qr" class="w-[280px] h-[280px] md:w-[380px] md:h-[380px]"></canvas>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[280px] md:max-w-[380px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">SSID Name:</span>
                             <span class="font-bold text-white font-mono" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
@@ -221,11 +221,11 @@
                     </div>
                     <div class="relative animate-float" style="animation-delay: 0.5s;">
                         <div class="absolute -inset-4 bg-secondary-fixed/10 blur-3xl rounded-full"></div>
-                        <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
-                            <canvas id="lobby-qr-wifi" class="w-56 h-56 md:w-64 md:h-64"></canvas>
+                        <div class="relative bg-white p-6 rounded-2xl shadow-xl neon-glow-secondary">
+                            <canvas id="lobby-qr-wifi" class="w-[280px] h-[280px] md:w-[380px] md:h-[380px]"></canvas>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[280px] md:max-w-[380px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">Join at:</span>
                             <span class="font-bold text-white truncate max-w-[180px]" x-text="`${gameState.hostIP}:${gameState.hostPort}`"></span>
@@ -713,7 +713,7 @@
                                     new QRious({
                                         element: defaultEl,
                                         value: joinUrl,
-                                        size: 400,
+                                        size: 600,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
@@ -725,7 +725,7 @@
                                     new QRious({
                                         element: wifiJoinEl,
                                         value: joinUrl,
-                                        size: 400,
+                                        size: 600,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
@@ -738,7 +738,7 @@
                                     new QRious({
                                         element: wifiNetEl,
                                         value: wifiString,
-                                        size: 400,
+                                        size: 600,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
