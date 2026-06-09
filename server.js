@@ -490,8 +490,14 @@ io.on('connection', (socket) => {
         // Update active socket and connection status
         player.socketId = socket.id;
         player.connected = true;
+        socket.join(gameSession.pin);
 
-        socket.emit('join-success', { playerId, name: player.name, avatar: player.avatar });
+        socket.emit('join-success', { 
+            playerId, 
+            name: player.name, 
+            avatar: player.avatar,
+            answerIndex: player.answerIndex 
+        });
         broadcastState();
     });
 

@@ -466,9 +466,7 @@
                                 this.selectedOption = null;
                             }
                         } else if (state.state === 'QUESTION_ACTIVE') {
-                            if (this.selectedOption === null) {
-                                this.clientState = 'question_active';
-                            }
+                            this.clientState = 'question_active';
                         } else if (state.state === 'QUESTION_LEADERBOARD') {
                             const me = state.players.find(p => p.id === this.playerId);
                             if (me) {
@@ -490,13 +488,17 @@
                         this.gameState.timeRemaining = time;
                     });
 
-                    this.socket.on('join-success', ({ playerId, name, avatar }) => {
+                    this.socket.on('join-success', ({ playerId, name, avatar, answerIndex }) => {
                         this.isJoining = false;
                         this.playerId = playerId;
                         this.nickname = name;
                         this.selectedAvatar = avatar;
                         this.clientState = 'waiting_lobby';
                         this.errorMessage = '';
+
+                        if (answerIndex !== undefined && answerIndex !== null) {
+                            this.selectedOption = answerIndex;
+                        }
 
                         // Save session to survive reloads/tab sleep
                         sessionStorage.setItem('quizspot_playerId', playerId);
@@ -528,7 +530,19 @@
                         this.pin = params.get('pin');
                     }
 
-                    // Automatic Rejoin logic from sessionStorage
+                    // Automatic Rejoin trigger on socket connect/reconnect
+                    this.socket.on('connect', () => {
+                        const savedPlayerId = sessionStorage.getItem('quizspot_playerId');
+                        const savedPin = sessionStorage.getItem('quizspot_pin');
+                        if (savedPlayerId && savedPin) {
+                            this.socket.emit('rejoin-game', {
+                                playerId: savedPlayerId,
+                                pin: savedPin
+                            });
+                        }
+                    });
+
+                    // Pre-fill local state from sessionStorage to survive reloads/tab sleep
                     const savedPlayerId = sessionStorage.getItem('quizspot_playerId');
                     const savedNickname = sessionStorage.getItem('quizspot_nickname');
                     const savedAvatar = sessionStorage.getItem('quizspot_selectedAvatar');
@@ -541,19 +555,6 @@
                             this.nickname = savedNickname;
                             this.selectedAvatar = parseInt(savedAvatar, 10);
                             this.playerId = savedPlayerId;
-
-                            const attemptRejoin = () => {
-                                this.socket.emit('rejoin-game', {
-                                    playerId: this.playerId,
-                                    pin: this.pin
-                                });
-                            };
-
-                            if (this.socket.connected) {
-                                attemptRejoin();
-                            } else {
-                                this.socket.on('connect', attemptRejoin);
-                            }
                         }
                     }
                 },
