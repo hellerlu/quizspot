@@ -165,7 +165,7 @@
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
-                            <canvas id="lobby-qr-default" class="w-64 h-64 md:w-80 md:h-80"></canvas>
+                            <canvas id="lobby-qr-default" class="w-80 h-80 md:w-96 md:h-96"></canvas>
                         </div>
                     </div>
                 </div>
@@ -197,7 +197,7 @@
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-primary">
-                            <canvas id="wifi-qr" class="w-48 h-48 md:w-56 md:h-56"></canvas>
+                            <canvas id="wifi-qr" class="w-56 h-56 md:w-64 md:h-64"></canvas>
                         </div>
                     </div>
                     <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
@@ -222,7 +222,7 @@
                     <div class="relative animate-float" style="animation-delay: 0.5s;">
                         <div class="absolute -inset-4 bg-secondary-fixed/10 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
-                            <canvas id="lobby-qr-wifi" class="w-48 h-48 md:w-56 md:h-56"></canvas>
+                            <canvas id="lobby-qr-wifi" class="w-56 h-56 md:w-64 md:h-64"></canvas>
                         </div>
                     </div>
                     <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40">
@@ -263,7 +263,10 @@
                 <div class="flex flex-wrap gap-sm">
                     <template x-for="(p, index) in gameState.players" :key="p.id">
                         <div class="group flex items-center bg-surface-container-highest p-1 gap-2 pr-3 rounded-full border border-white/5 transition-all cursor-default shrink-0"
-                             :class="index % 4 === 0 ? 'neon-glow-primary hover:border-primary/50' : (index % 4 === 1 ? 'neon-glow-secondary hover:border-secondary-fixed/50' : (index % 4 === 2 ? 'hover:border-tertiary/50' : 'hover:border-primary-fixed-dim/50'))">
+                             :class="[
+                                 index % 4 === 0 ? 'neon-glow-primary hover:border-primary/50' : (index % 4 === 1 ? 'neon-glow-secondary hover:border-secondary-fixed/50' : (index % 4 === 2 ? 'hover:border-tertiary/50' : 'hover:border-primary-fixed-dim/50')),
+                                 p.connected ? '' : 'opacity-50'
+                             ]">
                             <!-- Avatar via Background Sprite (scale wrapped to crop white corners) -->
                             <div class="w-9 h-9 rounded-full border border-white/10 overflow-hidden shrink-0 bg-surface-container-highest">
                                 <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat" 
@@ -325,43 +328,43 @@
             </template>
 
             <!-- Options Grid (2x2) -->
-            <section class="grid grid-cols-2 gap-sm w-full max-w-7xl h-1/4">
+            <section class="grid grid-cols-2 gap-md w-full max-w-[95%] xl:max-w-[1600px] h-1/3 min-h-[220px] mt-md">
                 <!-- Option 0: Red Triangle -->
                 <div class="relative group transition-all duration-200">
-                    <div class="absolute inset-0 bg-[#ff003c] rounded-xl opacity-10"></div>
-                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#ff003c]">
-                        <span class="material-symbols-outlined text-headline-sm text-[#ff003c] mr-sm" style="font-variation-settings: 'FILL' 1;">change_history</span>
-                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[0] : ''"></span>
+                    <div class="absolute inset-0 bg-[#ff003c] rounded-2xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#ff003c] shadow-lg">
+                        <span class="material-symbols-outlined text-headline-md text-[#ff003c] mr-md" style="font-variation-settings: 'FILL' 1;">change_history</span>
+                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[0] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 1: Blue Diamond -->
                 <div class="relative group transition-all duration-200">
-                    <div class="absolute inset-0 bg-[#00a2ff] rounded-xl opacity-10"></div>
-                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#00a2ff]">
-                        <span class="material-symbols-outlined text-headline-sm text-[#00a2ff] mr-sm" style="font-variation-settings: 'FILL' 1;">diamond</span>
-                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[1] : ''"></span>
+                    <div class="absolute inset-0 bg-[#00a2ff] rounded-2xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#00a2ff] shadow-lg">
+                        <span class="material-symbols-outlined text-headline-md text-[#00a2ff] mr-md" style="font-variation-settings: 'FILL' 1;">diamond</span>
+                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[1] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 2: Yellow Circle -->
                 <div class="relative group transition-all duration-200">
-                    <div class="absolute inset-0 bg-[#ffd600] rounded-xl opacity-10"></div>
-                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#ffd600]">
-                        <span class="material-symbols-outlined text-headline-sm text-[#ffd600] mr-sm" style="font-variation-settings: 'FILL' 1;">circle</span>
-                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[2] : ''"></span>
+                    <div class="absolute inset-0 bg-[#ffd600] rounded-2xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#ffd600] shadow-lg">
+                        <span class="material-symbols-outlined text-headline-md text-[#ffd600] mr-md" style="font-variation-settings: 'FILL' 1;">circle</span>
+                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[2] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 3: Green Square -->
                 <div class="relative group transition-all duration-200">
-                    <div class="absolute inset-0 bg-[#2ae500] rounded-xl opacity-10"></div>
-                    <div class="glass-panel h-full w-full rounded-xl flex items-center px-md border-l-[8px] border-[#2ae500]">
-                        <span class="material-symbols-outlined text-headline-sm text-[#2ae500] mr-sm" style="font-variation-settings: 'FILL' 1;">square</span>
-                        <span class="font-headline-sm lg:font-headline-md text-on-surface" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[3] : ''"></span>
+                    <div class="absolute inset-0 bg-[#2ae500] rounded-2xl opacity-10"></div>
+                    <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#2ae500] shadow-lg">
+                        <span class="material-symbols-outlined text-headline-md text-[#2ae500] mr-md" style="font-variation-settings: 'FILL' 1;">square</span>
+                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[3] : ''"></span>
                     </div>
                 </div>
             </section>
 
             <!-- Answers Received indicator -->
-            <div class="w-full max-w-7xl mt-md flex justify-between items-center">
+            <div class="w-full max-w-[95%] xl:max-w-[1600px] mt-lg flex justify-between items-center">
                 <div class="flex flex-col gap-xs max-w-[320px] w-full">
                     <div class="flex justify-between items-center">
                         <span class="font-label-bold text-xs text-outline uppercase tracking-wider">Answers Received</span>
@@ -379,7 +382,8 @@
                 <div class="flex gap-md">
                     <div class="flex -space-x-4">
                         <template x-for="(p, index) in gameState.players ? gameState.players.slice(0, 5) : []">
-                            <div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden shrink-0 bg-surface-container-highest">
+                            <div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden shrink-0 bg-surface-container-highest transition-opacity duration-300"
+                                 :class="p.connected ? '' : 'opacity-30'">
                                 <div class="w-full h-full scale-[1.12] bg-cover bg-no-repeat"
                                      :style="`background-image: url('/assets/avatars.png'); background-size: 400% 300%; background-position: ${((p.avatar-1) % 4) * 33.33}% ${Math.floor((p.avatar-1) / 4) * 50}%;`"></div>
                             </div>
@@ -588,7 +592,7 @@
             <div class="flex items-center gap-sm">
                 <span class="w-2.5 h-2.5 bg-secondary-fixed rounded-full bar-glow"></span>
                 <span class="font-label-bold uppercase text-[10px] tracking-widest text-outline-variant"
-                      x-text="`${gameState.players ? gameState.players.length : 0} Players Connected`"></span>
+                      x-text="`${gameState.players ? gameState.players.filter(p => p.connected).length : 0} Players Connected`"></span>
             </div>
             <div class="flex items-center gap-sm" x-show="gameState.state !== 'LOBBY' && gameState.state !== 'GAME_OVER'">
                 <span class="w-2.5 h-2.5 bg-primary rounded-full animate-pulse"></span>
@@ -690,7 +694,7 @@
                                     new QRious({
                                         element: defaultEl,
                                         value: joinUrl,
-                                        size: 300,
+                                        size: 400,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
@@ -702,7 +706,7 @@
                                     new QRious({
                                         element: wifiJoinEl,
                                         value: joinUrl,
-                                        size: 300,
+                                        size: 400,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
@@ -715,7 +719,7 @@
                                     new QRious({
                                         element: wifiNetEl,
                                         value: wifiString,
-                                        size: 300,
+                                        size: 400,
                                         background: 'white',
                                         foreground: '#10131b'
                                     });

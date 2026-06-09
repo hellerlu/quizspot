@@ -23,6 +23,21 @@ function getQuizName(filename) {
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Middleware to disable caching for HTML files and API routes
+// This prevents browsers (especially Chrome on Android) from storing offline snapshots
+// which can result in broken fonts and stale views when the device has no global internet connection.
+app.use((req, res, next) => {
+    const isHtml = req.path.endsWith('.html') || req.path === '/' || req.path === '';
+    const isApi = req.path.startsWith('/api/');
+    if (isHtml || isApi) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+    next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Helper to get local IP address
@@ -37,6 +52,28 @@ function getLocalIP() {
         }
     }
     return '127.0.0.1';
+}
+
+const CONFIG_FILE = path.join(__dirname, 'config.json');
+
+function loadConfig() {
+    try {
+        if (fs.existsSync(CONFIG_FILE)) {
+            const data = fs.readFileSync(CONFIG_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (e) {
+        console.error('Error reading config.json:', e.message);
+    }
+    return {};
+}
+
+function saveConfig(config) {
+    try {
+        fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+    } catch (e) {
+        console.error('Error writing config.json:', e.message);
+    }
 }
 
 // REST APIs for Quiz Management
@@ -210,6 +247,8 @@ app.get('/api/ip', (req, res) => {
     res.json({ ip: getLocalIP(), port: PORT });
 });
 
+const config = loadConfig();
+
 // Single Active Game Session state
 let gameSession = {
     pin: '',
@@ -222,9 +261,9 @@ let gameSession = {
     timeRemaining: 0,
     getReadyDuration: 4, // default transition time in seconds
     wifi: {
-        ssid: '',
-        password: '',
-        security: 'WPA'
+        ssid: config.wifi ? (config.wifi.ssid || '') : '',
+        password: config.wifi ? (config.wifi.password || '') : '',
+        security: config.wifi ? (config.wifi.security || 'WPA') : 'WPA'
     }
 };
 
@@ -256,7 +295,8 @@ function broadcastState() {
         lastAnswerCorrect: p.lastAnswerCorrect,
         scoreChange: p.scoreChange,
         hasAnswered: p.answerIndex !== null,
-        answerIndex: (gameSession.state === 'QUESTION_LEADERBOARD' || gameSession.state === 'GAME_OVER') ? p.answerIndex : null
+        answerIndex: (gameSession.state === 'QUESTION_LEADERBOARD' || gameSession.state === 'GAME_OVER') ? p.answerIndex : null,
+        connected: p.connected
     }));
 
     // Sort leaderboard for TV
@@ -307,8 +347,7 @@ function endQuestion() {
     const timeLimitLimit = q.timeLimit * 1000;
 
     // Process scores for this question
-    Object.keys(gameSession.players).forEach(socketId => {
-        const player = gameSession.players[socketId];
+    Object.values(gameSession.players).forEach(player => {
         if (player.answerIndex !== null && player.answerIndex === correctIdx) {
             // Calculate speed score decay: 1000 down to 500
             const elapsed = player.answerTime - gameSession.questionStartTime;
@@ -368,8 +407,7 @@ function startActiveQuestion() {
     gameSession.questionStartTime = Date.now();
     
     // Reset answer markers
-    Object.keys(gameSession.players).forEach(socketId => {
-        const player = gameSession.players[socketId];
+    Object.values(gameSession.players).forEach(player => {
         player.answerIndex = null;
         player.answerTime = null;
     });
@@ -381,7 +419,6 @@ function startActiveQuestion() {
 io.on('connection', (socket) => {
     console.log(`Socket connected: ${socket.id}`);
 
-    // Update session settings
     socket.on('update-settings', (settings) => {
         if (settings) {
             if (typeof settings.getReadyDuration === 'number') {
@@ -393,6 +430,8 @@ io.on('connection', (socket) => {
                     password: typeof settings.wifi.password === 'string' ? settings.wifi.password.trim() : '',
                     security: typeof settings.wifi.security === 'string' ? settings.wifi.security : 'WPA'
                 };
+                // Save Wi-Fi config to local config.json file
+                saveConfig({ wifi: gameSession.wifi });
             }
             broadcastState();
         }
@@ -420,24 +459,45 @@ io.on('connection', (socket) => {
             return socket.emit('join-error', 'Nickname already taken.');
         }
 
-        gameSession.players[socket.id] = {
-            id: socket.id,
+        const playerId = 'p_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        gameSession.players[playerId] = {
+            id: playerId,
+            socketId: socket.id,
             name: name,
             avatar: avatar,
             score: 0,
             lastAnswerCorrect: false,
             scoreChange: 0,
             answerIndex: null,
-            answerTime: null
+            answerTime: null,
+            connected: true
         };
 
-        socket.emit('join-success', { name, avatar });
+        socket.emit('join-success', { playerId, name, avatar });
+        broadcastState();
+    });
+
+    // Player Re-joins (Reconnection)
+    socket.on('rejoin-game', ({ playerId, pin }) => {
+        if (pin !== gameSession.pin) {
+            return socket.emit('join-error', 'Invalid PIN Code.');
+        }
+        const player = gameSession.players[playerId];
+        if (!player) {
+            return socket.emit('join-error', 'Session not found. Please join again.');
+        }
+
+        // Update active socket and connection status
+        player.socketId = socket.id;
+        player.connected = true;
+
+        socket.emit('join-success', { playerId, name: player.name, avatar: player.avatar });
         broadcastState();
     });
 
     // Player submits answer
     socket.on('submit-answer', (answerIndex) => {
-        const player = gameSession.players[socket.id];
+        const player = Object.values(gameSession.players).find(p => p.socketId === socket.id);
         if (!player) return;
         if (gameSession.state !== 'QUESTION_ACTIVE') return;
         if (player.answerIndex !== null) return; // Only allow one submission
@@ -447,8 +507,9 @@ io.on('connection', (socket) => {
 
         socket.emit('answer-accepted');
 
-        // Check if all players have answered
-        const allAnswered = Object.values(gameSession.players).every(p => p.answerIndex !== null);
+        // Check if all connected players have answered
+        const connectedPlayers = Object.values(gameSession.players).filter(p => p.connected);
+        const allAnswered = connectedPlayers.length > 0 && connectedPlayers.every(p => p.answerIndex !== null);
         if (allAnswered) {
             endQuestion();
         } else {
@@ -462,8 +523,7 @@ io.on('connection', (socket) => {
         if (gameSession.questions.length === 0) return;
         
         // Reset player scores
-        Object.keys(gameSession.players).forEach(socketId => {
-            const player = gameSession.players[socketId];
+        Object.values(gameSession.players).forEach(player => {
             player.score = 0;
             player.lastAnswerCorrect = false;
             player.scoreChange = 0;
@@ -494,10 +554,10 @@ io.on('connection', (socket) => {
         
         gameSession.state = 'LOBBY';
         gameSession.currentQuestionIndex = -1;
-        gameSession.pin = generatePIN();
-        // Keep players but reset scores
-        Object.keys(gameSession.players).forEach(socketId => {
-            const player = gameSession.players[socketId];
+        // Keep the same PIN code: gameSession.pin stays the same
+        
+        // Keep players but reset scores and answers
+        Object.values(gameSession.players).forEach(player => {
             player.score = 0;
             player.lastAnswerCorrect = false;
             player.scoreChange = 0;
@@ -509,14 +569,23 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        if (gameSession.players[socket.id]) {
-            console.log(`Player disconnected: ${gameSession.players[socket.id].name}`);
-            delete gameSession.players[socket.id];
+        const player = Object.values(gameSession.players).find(p => p.socketId === socket.id);
+        if (player) {
+            console.log(`Player disconnected: ${player.name}`);
             
-            // If in active question, check if all remaining players have answered
+            if (gameSession.state === 'LOBBY') {
+                // Remove player completely if disconnected during lobby
+                delete gameSession.players[player.id];
+            } else {
+                // Keep player in session but mark offline
+                player.connected = false;
+                player.socketId = null;
+            }
+            
+            // If in active question, check if all remaining connected players have answered
             if (gameSession.state === 'QUESTION_ACTIVE') {
-                const activePlayers = Object.values(gameSession.players);
-                if (activePlayers.length > 0 && activePlayers.every(p => p.answerIndex !== null)) {
+                const connectedPlayers = Object.values(gameSession.players).filter(p => p.connected);
+                if (connectedPlayers.length > 0 && connectedPlayers.every(p => p.answerIndex !== null)) {
                     endQuestion();
                 }
             }

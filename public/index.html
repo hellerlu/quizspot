@@ -120,6 +120,28 @@
                 <p class="font-body-md text-body-md text-outline-variant mt-xs">Local Real-time Arena</p>
             </div>
 
+            <!-- iOS Safari Warning Banner -->
+            <template x-if="isIOS() && isSafari()">
+                <div class="w-full bg-[#ffd600]/10 border border-[#ffd600]/30 rounded-xl p-4 text-left space-y-2">
+                    <div class="flex items-center gap-sm text-[#ffd600]">
+                        <span class="material-symbols-outlined text-lg">warning</span>
+                        <span class="font-label-bold text-xs uppercase tracking-wider">iOS Safari detected</span>
+                    </div>
+                    <p class="text-xs text-outline leading-relaxed">
+                        Safari on iOS may block connections to local game servers when offline.
+                    </p>
+                    <div class="flex flex-col gap-2 pt-1">
+                        <a :href="`googlechrome://${window.location.host}${window.location.pathname}${window.location.search}`" 
+                           class="w-full bg-[#00a2ff] text-white text-center font-label-bold text-xs py-2.5 rounded-lg hover:bg-[#0082d9] active:scale-95 transition-all block">
+                            SWITCH TO GOOGLE CHROME
+                        </a>
+                        <p class="text-[10px] text-outline-variant text-center">
+                            Alternatively, temporarily turn off <strong>Cellular Data</strong> in your phone settings.
+                        </p>
+                    </div>
+                </div>
+            </template>
+
             <!-- PIN Input -->
             <div class="w-full relative group">
                 <label class="absolute -top-3 left-4 px-2 bg-[#10131b] font-label-bold text-[10px] tracking-wider text-primary z-20">GAME PIN</label>
@@ -411,6 +433,7 @@
                 pin: '',
                 nickname: '',
                 selectedAvatar: 1,
+                playerId: null,
                 gameState: {},
                 lastAnswerCorrect: false,
                 scoreChange: 0,
@@ -430,7 +453,10 @@
                         this.gameState = state;
 
                         if (state.state === 'LOBBY') {
-                            if (this.clientState !== 'join' && this.clientState !== 'waiting_lobby') {
+                            const me = state.players.find(p => p.id === this.playerId);
+                            if (me) {
+                                this.clientState = 'waiting_lobby';
+                            } else if (this.clientState !== 'join' && this.clientState !== 'waiting_lobby') {
                                 this.clientState = 'join';
                                 this.selectedOption = null;
                             }
@@ -444,7 +470,7 @@
                                 this.clientState = 'question_active';
                             }
                         } else if (state.state === 'QUESTION_LEADERBOARD') {
-                            const me = state.players.find(p => p.id === this.socket.id);
+                            const me = state.players.find(p => p.id === this.playerId);
                             if (me) {
                                 this.lastAnswerCorrect = me.lastAnswerCorrect;
                                 this.scoreChange = me.scoreChange;
@@ -452,7 +478,7 @@
                             }
                             this.clientState = 'question_feedback';
                         } else if (state.state === 'GAME_OVER') {
-                            const me = state.players.find(p => p.id === this.socket.id);
+                            const me = state.players.find(p => p.id === this.playerId);
                             if (me) {
                                 this.currentScore = me.score;
                             }
@@ -464,15 +490,31 @@
                         this.gameState.timeRemaining = time;
                     });
 
-                    this.socket.on('join-success', ({ name, avatar }) => {
+                    this.socket.on('join-success', ({ playerId, name, avatar }) => {
                         this.isJoining = false;
+                        this.playerId = playerId;
+                        this.nickname = name;
+                        this.selectedAvatar = avatar;
                         this.clientState = 'waiting_lobby';
                         this.errorMessage = '';
+
+                        // Save session to survive reloads/tab sleep
+                        sessionStorage.setItem('quizspot_playerId', playerId);
+                        sessionStorage.setItem('quizspot_nickname', name);
+                        sessionStorage.setItem('quizspot_selectedAvatar', avatar);
+                        sessionStorage.setItem('quizspot_pin', this.pin.replace(/\s+/g, ''));
                     });
 
                     this.socket.on('join-error', (msg) => {
                         this.isJoining = false;
                         this.errorMessage = msg;
+                        // Clear invalid sessions
+                        sessionStorage.removeItem('quizspot_playerId');
+                        sessionStorage.removeItem('quizspot_nickname');
+                        sessionStorage.removeItem('quizspot_selectedAvatar');
+                        sessionStorage.removeItem('quizspot_pin');
+                        this.playerId = null;
+                        this.clientState = 'join';
                     });
 
                     this.socket.on('answer-accepted', () => {
@@ -484,6 +526,35 @@
                     const params = new URLSearchParams(window.location.search);
                     if (params.has('pin')) {
                         this.pin = params.get('pin');
+                    }
+
+                    // Automatic Rejoin logic from sessionStorage
+                    const savedPlayerId = sessionStorage.getItem('quizspot_playerId');
+                    const savedNickname = sessionStorage.getItem('quizspot_nickname');
+                    const savedAvatar = sessionStorage.getItem('quizspot_selectedAvatar');
+                    const savedPin = sessionStorage.getItem('quizspot_pin');
+
+                    if (savedPlayerId && savedNickname && savedAvatar && savedPin) {
+                        const currentPin = this.pin ? this.pin.replace(/\s+/g, '') : '';
+                        if (!currentPin || currentPin === savedPin) {
+                            this.pin = savedPin;
+                            this.nickname = savedNickname;
+                            this.selectedAvatar = parseInt(savedAvatar, 10);
+                            this.playerId = savedPlayerId;
+
+                            const attemptRejoin = () => {
+                                this.socket.emit('rejoin-game', {
+                                    playerId: this.playerId,
+                                    pin: this.pin
+                                });
+                            };
+
+                            if (this.socket.connected) {
+                                attemptRejoin();
+                            } else {
+                                this.socket.on('connect', attemptRejoin);
+                            }
+                        }
                     }
                 },
                 joinGame() {
@@ -509,10 +580,17 @@
                 },
                 rank() {
                     if (!this.gameState.leaderboard) return 0;
-                    return this.gameState.leaderboard.findIndex(p => p.id === this.socket.id) + 1;
+                    return this.gameState.leaderboard.findIndex(p => p.id === this.playerId) + 1;
                 },
                 rankSuffix(r) {
                     return r === 1 ? 'st' : r === 2 ? 'nd' : r === 3 ? 'rd' : 'th';
+                },
+                isIOS() {
+                    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                },
+                isSafari() {
+                    const ua = navigator.userAgent;
+                    return /Safari/.test(ua) && !/Chrome|CriOS/.test(ua);
                 }
             };
         }

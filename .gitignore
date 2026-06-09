@@ -25,3 +25,6 @@ build/
 
 # Antigravity AI assistant files
 .agents/
+
+# Local custom configuration (Wi-Fi settings, etc.)
+config.json
