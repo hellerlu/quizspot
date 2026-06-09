@@ -452,16 +452,36 @@
                     this.socket.on('game-state', (state) => {
                         this.gameState = state;
 
-                        if (state.state === 'LOBBY') {
+                        // If the player has joined, verify they are still in the game session
+                        if (this.playerId) {
                             const me = state.players.find(p => p.id === this.playerId);
-                            if (me) {
-                                this.clientState = 'waiting_lobby';
-                            } else if (this.clientState !== 'join' && this.clientState !== 'waiting_lobby') {
+                            if (!me) {
+                                // Session lost or kicked!
+                                sessionStorage.removeItem('quizspot_playerId');
+                                sessionStorage.removeItem('quizspot_nickname');
+                                sessionStorage.removeItem('quizspot_selectedAvatar');
+                                sessionStorage.removeItem('quizspot_pin');
+                                this.playerId = null;
                                 this.clientState = 'join';
                                 this.selectedOption = null;
+                                // Only show session lost if it wasn't already set to kicked
+                                if (!this.errorMessage || !this.errorMessage.includes('kicked')) {
+                                    this.errorMessage = 'You are not in this game session.';
+                                }
+                                return;
                             }
+                        }
+
+                        // If not joined, force stay on join screen
+                        if (!this.playerId) {
+                            this.clientState = 'join';
+                            return;
+                        }
+
+                        if (state.state === 'LOBBY') {
+                            this.clientState = 'waiting_lobby';
                         } else if (state.state === 'QUESTION_INTRO') {
-                            if (this.clientState === 'waiting_lobby' || this.clientState === 'question_feedback' || this.clientState === 'join') {
+                            if (this.clientState === 'waiting_lobby' || this.clientState === 'question_feedback') {
                                 this.clientState = 'question_intro';
                                 this.selectedOption = null;
                             }
