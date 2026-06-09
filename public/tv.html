@@ -328,37 +328,56 @@
             </template>
 
             <!-- Options Grid (2x2) -->
-            <section class="grid grid-cols-2 gap-md w-full max-w-[95%] xl:max-w-[1600px] h-1/3 min-h-[220px] mt-md">
+            <section class="grid grid-cols-2 w-full max-w-[95%] xl:max-w-[1600px] mt-md"
+                     :class="[
+                         gameState.currentQuestion && gameState.currentQuestion.image ? 'h-1/4 lg:h-1/3 min-h-[200px] gap-md' : 'flex-grow min-h-[350px] mb-lg gap-lg'
+                     ]">
                 <!-- Option 0: Red Triangle -->
                 <div class="relative group transition-all duration-200">
                     <div class="absolute inset-0 bg-[#ff003c] rounded-2xl opacity-10"></div>
                     <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#ff003c] shadow-lg">
-                        <span class="material-symbols-outlined text-headline-md text-[#ff003c] mr-md" style="font-variation-settings: 'FILL' 1;">change_history</span>
-                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[0] : ''"></span>
+                        <span class="material-symbols-outlined text-[#ff003c] mr-md" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-md' : 'text-headline-lg'"
+                              style="font-variation-settings: 'FILL' 1;">change_history</span>
+                        <span class="font-headline-md text-on-surface font-extrabold leading-tight" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-sm lg:text-headline-md' : 'text-headline-md lg:text-headline-lg'"
+                              x-text="gameState.currentQuestion ? gameState.currentQuestion.options[0] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 1: Blue Diamond -->
                 <div class="relative group transition-all duration-200">
                     <div class="absolute inset-0 bg-[#00a2ff] rounded-2xl opacity-10"></div>
                     <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#00a2ff] shadow-lg">
-                        <span class="material-symbols-outlined text-headline-md text-[#00a2ff] mr-md" style="font-variation-settings: 'FILL' 1;">diamond</span>
-                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[1] : ''"></span>
+                        <span class="material-symbols-outlined text-[#00a2ff] mr-md" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-md' : 'text-headline-lg'"
+                              style="font-variation-settings: 'FILL' 1;">diamond</span>
+                        <span class="font-headline-md text-on-surface font-extrabold leading-tight" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-sm lg:text-headline-md' : 'text-headline-md lg:text-headline-lg'"
+                              x-text="gameState.currentQuestion ? gameState.currentQuestion.options[1] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 2: Yellow Circle -->
                 <div class="relative group transition-all duration-200">
                     <div class="absolute inset-0 bg-[#ffd600] rounded-2xl opacity-10"></div>
                     <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#ffd600] shadow-lg">
-                        <span class="material-symbols-outlined text-headline-md text-[#ffd600] mr-md" style="font-variation-settings: 'FILL' 1;">circle</span>
-                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[2] : ''"></span>
+                        <span class="material-symbols-outlined text-[#ffd600] mr-md" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-md' : 'text-headline-lg'"
+                              style="font-variation-settings: 'FILL' 1;">circle</span>
+                        <span class="font-headline-md text-on-surface font-extrabold leading-tight" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-sm lg:text-headline-md' : 'text-headline-md lg:text-headline-lg'"
+                              x-text="gameState.currentQuestion ? gameState.currentQuestion.options[2] : ''"></span>
                     </div>
                 </div>
                 <!-- Option 3: Green Square -->
                 <div class="relative group transition-all duration-200">
                     <div class="absolute inset-0 bg-[#2ae500] rounded-2xl opacity-10"></div>
                     <div class="glass-panel h-full w-full rounded-2xl flex items-center px-lg border-l-[12px] border-[#2ae500] shadow-lg">
-                        <span class="material-symbols-outlined text-headline-md text-[#2ae500] mr-md" style="font-variation-settings: 'FILL' 1;">square</span>
-                        <span class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-extrabold leading-tight" x-text="gameState.currentQuestion ? gameState.currentQuestion.options[3] : ''"></span>
+                        <span class="material-symbols-outlined text-[#2ae500] mr-md" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-md' : 'text-headline-lg'"
+                              style="font-variation-settings: 'FILL' 1;">square</span>
+                        <span class="font-headline-md text-on-surface font-extrabold leading-tight" 
+                              :class="gameState.currentQuestion && gameState.currentQuestion.image ? 'text-headline-sm lg:text-headline-md' : 'text-headline-md lg:text-headline-lg'"
+                              x-text="gameState.currentQuestion ? gameState.currentQuestion.options[3] : ''"></span>
                     </div>
                 </div>
             </section>
