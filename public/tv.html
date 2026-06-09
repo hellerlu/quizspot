@@ -142,7 +142,7 @@
             <!-- Default Layout (No Wi-Fi configured) -->
             <div x-show="!gameState.wifi || !gameState.wifi.ssid" class="grid grid-cols-12 gap-lg items-center mt-4">
                 <!-- Left Side: Instructions & QR Info -->
-                <div class="col-span-5 flex flex-col gap-lg items-start">
+                <div class="col-span-4 flex flex-col gap-lg items-start">
                     <div class="space-y-sm">
                         <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight leading-tight">Waiting for Players...</h2>
                         <p class="font-body-lg text-body-lg text-outline-variant max-w-[480px]">Join the game to test your knowledge against friends in real-time!</p>
@@ -160,12 +160,23 @@
                     </div>
                 </div>
 
-                <!-- Middle: Rotating QR Code -->
-                <div class="col-span-4 flex justify-center">
-                    <div class="relative animate-float">
+                <!-- Middle: Rotating QR Codes -->
+                <div class="col-span-5 flex justify-center">
+                    <div class="relative animate-float flex gap-lg justify-center items-center">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
-                        <div class="relative bg-white p-6 rounded-2xl shadow-2xl neon-glow-primary">
-                            <canvas id="lobby-qr-default" class="w-[320px] h-[320px] md:w-[460px] md:h-[460px]"></canvas>
+                        <!-- Standard QR -->
+                        <div class="relative flex flex-col items-center gap-sm">
+                            <div class="relative bg-white p-5 rounded-2xl shadow-2xl neon-glow-primary">
+                                <canvas id="lobby-qr-default" class="w-[180px] h-[180px] md:w-[220px] md:h-[220px]"></canvas>
+                            </div>
+                            <span class="text-[10px] font-label-bold text-outline-variant uppercase tracking-widest bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">Android / Default</span>
+                        </div>
+                        <!-- Chrome iOS QR -->
+                        <div class="relative flex flex-col items-center gap-sm">
+                            <div class="relative bg-white p-5 rounded-2xl shadow-2xl neon-glow-secondary">
+                                <canvas id="lobby-qr-default-chrome" class="w-[180px] h-[180px] md:w-[220px] md:h-[220px]"></canvas>
+                            </div>
+                            <span class="text-[10px] font-label-bold text-secondary-fixed uppercase tracking-widest bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">iOS (Chrome)</span>
                         </div>
                     </div>
                 </div>
@@ -189,43 +200,54 @@
             <!-- Wi-Fi Enabled Layout (SSID configured) -->
             <div x-show="gameState.wifi && gameState.wifi.ssid" class="grid grid-cols-12 gap-md items-center mt-4">
                 <!-- Step 1: Wi-Fi Hotspot Connect -->
-                <div class="col-span-5 flex flex-col gap-md items-center text-center">
+                <div class="col-span-4 flex flex-col gap-md items-center text-center">
                     <div class="space-y-xs">
                         <span class="px-3 py-1 rounded bg-[#adc7ff]/10 text-primary font-label-bold text-xs uppercase tracking-wider">Step 1: Connect to Hotspot</span>
                         <h2 class="text-2xl text-on-surface font-extrabold tracking-tight">Scan for Wi-Fi</h2>
                     </div>
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
-                        <div class="relative bg-white p-6 rounded-2xl shadow-xl neon-glow-primary">
-                            <canvas id="wifi-qr" class="w-[280px] h-[280px] md:w-[380px] md:h-[380px]"></canvas>
+                        <div class="relative bg-white p-5 rounded-2xl shadow-xl neon-glow-primary">
+                            <canvas id="wifi-qr" class="w-[200px] h-[200px] md:w-[260px] md:h-[260px]"></canvas>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full max-w-[280px] md:max-w-[380px] text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[200px] md:max-w-[260px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">SSID Name:</span>
-                            <span class="font-bold text-white font-mono" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
+                            <span class="font-bold text-white font-mono truncate max-w-[100px]" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
                         </div>
                         <div class="h-px bg-white/5 w-full"></div>
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">Password:</span>
-                            <span class="font-bold text-white font-mono" x-text="gameState.wifi ? gameState.wifi.password : ''"></span>
+                            <span class="font-bold text-white font-mono truncate max-w-[100px]" x-text="gameState.wifi ? gameState.wifi.password : ''"></span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Step 2: Game Connection -->
-                <div class="col-span-5 flex flex-col gap-md items-center text-center">
+                <div class="col-span-6 flex flex-col gap-md items-center text-center">
                     <div class="space-y-xs">
                         <span class="px-3 py-1 rounded bg-[#79ff5b]/10 text-secondary-fixed font-label-bold text-xs uppercase tracking-wider">Step 2: Enter Arena</span>
                         <h2 class="text-2xl text-on-surface font-extrabold tracking-tight">Scan to Join Game</h2>
                     </div>
-                    <div class="relative animate-float" style="animation-delay: 0.5s;">
+                    <div class="relative animate-float flex gap-md justify-center items-center" style="animation-delay: 0.5s;">
                         <div class="absolute -inset-4 bg-secondary-fixed/10 blur-3xl rounded-full"></div>
-                        <div class="relative bg-white p-6 rounded-2xl shadow-xl neon-glow-secondary">
-                            <canvas id="lobby-qr-wifi" class="w-[280px] h-[280px] md:w-[380px] md:h-[380px]"></canvas>
+                        <!-- Standard QR -->
+                        <div class="relative flex flex-col items-center gap-sm">
+                            <div class="relative bg-white p-4 rounded-xl shadow-xl neon-glow-primary">
+                                <canvas id="lobby-qr-wifi" class="w-[150px] h-[150px] md:w-[190px] md:h-[190px]"></canvas>
+                            </div>
+                            <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/5">Android / Default</span>
+                        </div>
+                        <!-- Chrome iOS QR -->
+                        <div class="relative flex flex-col items-center gap-sm">
+                            <div class="relative bg-white p-4 rounded-xl shadow-xl neon-glow-secondary">
+                                <canvas id="lobby-qr-wifi-chrome" class="w-[150px] h-[150px] md:w-[190px] md:h-[190px]"></canvas>
+                            </div>
+                            <span class="text-[9px] font-label-bold text-secondary-fixed uppercase tracking-wider bg-surface/40 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/5">iOS (Chrome)</span>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full max-w-[280px] md:max-w-[380px] text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[320px] md:max-w-[400px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">Join at:</span>
                             <span class="font-bold text-white truncate max-w-[180px]" x-text="`${gameState.hostIP}:${gameState.hostPort}`"></span>
@@ -659,6 +681,42 @@
 
     <!-- Interactive Script -->
     <script>
+        function drawChromeLogo(canvas) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+            
+            // Chrome logo size in center (about 20% of QR code size)
+            const logoSize = size * 0.20;
+            const x = (size - logoSize) / 2;
+            const y = (size - logoSize) / 2;
+            
+            // 1. Draw a white circle to mask standard modules behind the logo
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, (logoSize / 2) * 1.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.restore();
+            
+            // 2. Load SVG of Google Chrome logo
+            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="${logoSize}" height="${logoSize}">
+  <circle cx="24" cy="24" r="9.5" fill="#1a73e8" />
+  <path d="M24,12H44.7812a23.9939,23.9939,0,0,0-41.5639.0029L13.6079,30l.0093-.0024A11.9852,11.9852,0,0,1,24,12Z" fill="#ea4335" />
+  <path d="M34.3913,30.0029,24.0007,48A23.994,23.994,0,0,0,44.78,12.0031H23.9989l-.0025.0093A11.985,11.985,0,0,1,34.3913,30.0029Z" fill="#fbbc04" />
+  <path d="M13.6086,30.0031,3.218,12.006A23.994,23.994,0,0,0,24.0025,48L34.3931,30.0029l-.0067-.0068a11.9852,11.9852,0,0,1-10.3845,17.994Z" fill="#34a853" />
+</svg>`;
+
+            const img = new Image();
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, x, y, logoSize, logoSize);
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        }
+
         function tvBroadcast() {
             return {
                 socket: null,
@@ -705,9 +763,10 @@
                         // Trigger QR generation when IP is set
                         if (state.hostIP) {
                             const joinUrl = `http://${state.hostIP}:${state.hostPort}/?pin=${state.pin}`;
+                            const chromeJoinUrl = `googlechrome://${state.hostIP}:${state.hostPort}/?pin=${state.pin}`;
                             
                             this.$nextTick(() => {
-                                // Default layout game QR
+                                // Default layout standard game QR
                                 const defaultEl = document.getElementById('lobby-qr-default');
                                 if (defaultEl) {
                                     new QRious({
@@ -718,8 +777,22 @@
                                         foreground: '#10131b'
                                     });
                                 }
+
+                                // Default layout Chrome game QR
+                                const defaultChromeEl = document.getElementById('lobby-qr-default-chrome');
+                                if (defaultChromeEl) {
+                                    new QRious({
+                                        element: defaultChromeEl,
+                                        value: chromeJoinUrl,
+                                        size: 600,
+                                        level: 'H',
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                    drawChromeLogo(defaultChromeEl);
+                                }
                                 
-                                // Wifi layout game QR
+                                // Wifi layout standard game QR
                                 const wifiJoinEl = document.getElementById('lobby-qr-wifi');
                                 if (wifiJoinEl) {
                                     new QRious({
@@ -729,6 +802,20 @@
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
+                                }
+
+                                // Wifi layout Chrome game QR
+                                const wifiJoinChromeEl = document.getElementById('lobby-qr-wifi-chrome');
+                                if (wifiJoinChromeEl) {
+                                    new QRious({
+                                        element: wifiJoinChromeEl,
+                                        value: chromeJoinUrl,
+                                        size: 600,
+                                        level: 'H',
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                    drawChromeLogo(wifiJoinChromeEl);
                                 }
                                 
                                 // Wifi network connect QR
