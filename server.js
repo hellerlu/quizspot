@@ -553,6 +553,30 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Host aborts the game
+    socket.on('abort-game', () => {
+        console.log('Aborting active game session...');
+        if (gameSession.timerId) {
+            clearInterval(gameSession.timerId);
+            gameSession.timerId = null;
+        }
+
+        gameSession.state = 'LOBBY';
+        gameSession.currentQuestionIndex = -1;
+        gameSession.timeRemaining = 0;
+
+        // Reset player scores and answers
+        Object.values(gameSession.players).forEach(player => {
+            player.score = 0;
+            player.lastAnswerCorrect = false;
+            player.scoreChange = 0;
+            player.answerIndex = null;
+            player.answerTime = null;
+        });
+
+        broadcastState();
+    });
+
     // Host Admin actions
     socket.on('start-game', () => {
         if (gameSession.state !== 'LOBBY') return;

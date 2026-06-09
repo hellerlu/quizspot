@@ -438,6 +438,14 @@
                         <span>PLAY AGAIN</span>
                     </div>
                 </button>
+
+                <!-- Abort Game Button (Visible during active gameplay states: INTRO, ACTIVE, LEADERBOARD) -->
+                <button x-show="['QUESTION_INTRO', 'QUESTION_ACTIVE', 'QUESTION_LEADERBOARD'].includes(gameState.state)" 
+                        @click="if (confirm('Are you sure you want to abort the current game? This will reset all scores.')) abortGame()" 
+                        class="w-full mt-4 py-4 rounded-2xl border-2 border-error/20 text-error hover:border-error/40 hover:bg-error/5 active:scale-95 transition-all duration-150 font-label-bold text-sm flex items-center justify-center gap-sm">
+                    <span class="material-symbols-outlined text-base">cancel</span>
+                    <span>ABORT GAME</span>
+                </button>
             </section>
         </div>
     </main>
@@ -634,6 +642,9 @@
                 },
                 playAgain() {
                     this.socket.emit('play-again');
+                },
+                abortGame() {
+                    this.socket.emit('abort-game');
                 },
                 kickPlayer(playerId) {
                     this.socket.emit('kick-player', playerId);
