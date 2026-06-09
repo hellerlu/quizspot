@@ -523,6 +523,36 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Host kicks a player
+    socket.on('kick-player', (playerId) => {
+        const player = gameSession.players[playerId];
+        if (player) {
+            console.log(`Kicking player: ${player.name}`);
+            
+            // Notify the player socket if they are connected
+            if (player.socketId) {
+                const playerSocket = io.sockets.sockets.get(player.socketId);
+                if (playerSocket) {
+                    playerSocket.emit('kicked');
+                    playerSocket.leave(gameSession.pin);
+                }
+            }
+            
+            // Remove the player completely
+            delete gameSession.players[playerId];
+
+            // If in active question, check if all remaining connected players have answered
+            if (gameSession.state === 'QUESTION_ACTIVE') {
+                const connectedPlayers = Object.values(gameSession.players).filter(p => p.connected);
+                if (connectedPlayers.length > 0 && connectedPlayers.every(p => p.answerIndex !== null)) {
+                    endQuestion();
+                }
+            }
+
+            broadcastState();
+        }
+    });
+
     // Host Admin actions
     socket.on('start-game', () => {
         if (gameSession.state !== 'LOBBY') return;

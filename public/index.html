@@ -525,6 +525,16 @@
                         // (i.e. all players answered or the timer expired).
                     });
 
+                    this.socket.on('kicked', () => {
+                        sessionStorage.removeItem('quizspot_playerId');
+                        sessionStorage.removeItem('quizspot_nickname');
+                        sessionStorage.removeItem('quizspot_selectedAvatar');
+                        sessionStorage.removeItem('quizspot_pin');
+                        this.playerId = null;
+                        this.clientState = 'join';
+                        this.errorMessage = 'You have been kicked by the host.';
+                    });
+
                     const params = new URLSearchParams(window.location.search);
                     if (params.has('pin')) {
                         this.pin = params.get('pin');

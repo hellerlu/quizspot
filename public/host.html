@@ -389,6 +389,10 @@
                                 <!-- Live indicator -->
                                 <span class="w-2 h-2 rounded-full transition-colors duration-300"
                                       :class="p.connected ? 'bg-secondary-fixed shadow-[0_0_8px_rgba(121,255,91,1)]' : 'bg-outline-variant'"></span>
+                                <!-- Kick Button -->
+                                <button @click="if (confirm('Are you sure you want to kick \'' + p.name + '\'?')) kickPlayer(p.id)" class="hover:text-error text-outline-variant hover:bg-white/10 p-1 rounded transition-colors flex items-center justify-center shrink-0 ml-1" title="Kick Player">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
                             </div>
                         </div>
                     </template>
@@ -630,6 +634,9 @@
                 },
                 playAgain() {
                     this.socket.emit('play-again');
+                },
+                kickPlayer(playerId) {
+                    this.socket.emit('kick-player', playerId);
                 },
                 updateGetReadyDuration() {
                     this.socket.emit('update-settings', { getReadyDuration: this.getReadyDuration });
