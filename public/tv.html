@@ -142,7 +142,7 @@
             <!-- Default Layout (No Wi-Fi configured) -->
             <div x-show="!gameState.wifi || !gameState.wifi.ssid" class="grid grid-cols-12 gap-lg items-center mt-4">
                 <!-- Left Side: Instructions & QR Info -->
-                <div class="col-span-4 flex flex-col gap-lg items-start">
+                <div class="col-span-3 flex flex-col gap-lg items-start">
                     <div class="space-y-sm">
                         <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight leading-tight">Waiting for Players...</h2>
                         <p class="font-body-lg text-body-lg text-outline-variant max-w-[480px]">Join the game to test your knowledge against friends in real-time!</p>
@@ -161,20 +161,20 @@
                 </div>
 
                 <!-- Middle: Rotating QR Codes -->
-                <div class="col-span-5 flex justify-center">
+                <div class="col-span-6 flex justify-center">
                     <div class="relative animate-float flex gap-lg justify-center items-center">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <!-- Standard QR -->
                         <div class="relative flex flex-col items-center gap-sm">
                             <div class="relative bg-white p-5 rounded-2xl shadow-2xl neon-glow-primary">
-                                <canvas id="lobby-qr-default" class="w-[180px] h-[180px] md:w-[220px] md:h-[220px]"></canvas>
+                                <canvas id="lobby-qr-default" class="w-[240px] h-[240px] md:w-[320px] md:h-[320px]"></canvas>
                             </div>
                             <span class="text-[10px] font-label-bold text-outline-variant uppercase tracking-widest bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">Android / Default</span>
                         </div>
                         <!-- Chrome iOS QR -->
                         <div class="relative flex flex-col items-center gap-sm">
                             <div class="relative bg-white p-5 rounded-2xl shadow-2xl neon-glow-secondary">
-                                <canvas id="lobby-qr-default-chrome" class="w-[180px] h-[180px] md:w-[220px] md:h-[220px]"></canvas>
+                                <canvas id="lobby-qr-default-chrome" class="w-[240px] h-[240px] md:w-[320px] md:h-[320px]"></canvas>
                             </div>
                             <span class="text-[10px] font-label-bold text-secondary-fixed uppercase tracking-widest bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">iOS (Chrome)</span>
                         </div>
@@ -208,18 +208,18 @@
                     <div class="relative animate-float">
                         <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full"></div>
                         <div class="relative bg-white p-5 rounded-2xl shadow-xl neon-glow-primary">
-                            <canvas id="wifi-qr" class="w-[200px] h-[200px] md:w-[260px] md:h-[260px]"></canvas>
+                            <canvas id="wifi-qr" class="w-[240px] h-[240px] md:w-[320px] md:h-[320px]"></canvas>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full max-w-[200px] md:max-w-[260px] text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[240px] md:max-w-[320px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">SSID Name:</span>
-                            <span class="font-bold text-white font-mono truncate max-w-[100px]" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
+                            <span class="font-bold text-white font-mono truncate max-w-[150px]" x-text="gameState.wifi ? gameState.wifi.ssid : ''"></span>
                         </div>
                         <div class="h-px bg-white/5 w-full"></div>
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">Password:</span>
-                            <span class="font-bold text-white font-mono truncate max-w-[100px]" x-text="gameState.wifi ? gameState.wifi.password : ''"></span>
+                            <span class="font-bold text-white font-mono truncate max-w-[150px]" x-text="gameState.wifi ? gameState.wifi.password : ''"></span>
                         </div>
                     </div>
                 </div>
@@ -235,22 +235,22 @@
                         <!-- Standard QR -->
                         <div class="relative flex flex-col items-center gap-sm">
                             <div class="relative bg-white p-4 rounded-xl shadow-xl neon-glow-primary">
-                                <canvas id="lobby-qr-wifi" class="w-[150px] h-[150px] md:w-[190px] md:h-[190px]"></canvas>
+                                <canvas id="lobby-qr-wifi" class="w-[180px] h-[180px] md:w-[240px] md:h-[240px]"></canvas>
                             </div>
                             <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/5">Android / Default</span>
                         </div>
                         <!-- Chrome iOS QR -->
                         <div class="relative flex flex-col items-center gap-sm">
                             <div class="relative bg-white p-4 rounded-xl shadow-xl neon-glow-secondary">
-                                <canvas id="lobby-qr-wifi-chrome" class="w-[150px] h-[150px] md:w-[190px] md:h-[190px]"></canvas>
+                                <canvas id="lobby-qr-wifi-chrome" class="w-[180px] h-[180px] md:w-[240px] md:h-[240px]"></canvas>
                             </div>
                             <span class="text-[9px] font-label-bold text-secondary-fixed uppercase tracking-wider bg-surface/40 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/5">iOS (Chrome)</span>
                         </div>
                     </div>
-                    <div class="glass-panel p-sm rounded-xl w-full max-w-[320px] md:max-w-[400px] text-left space-y-1 bg-surface-container-lowest/40">
+                    <div class="glass-panel p-sm rounded-xl w-full max-w-[380px] md:max-w-[500px] text-left space-y-1 bg-surface-container-lowest/40">
                         <div class="flex justify-between items-center text-xs">
                             <span class="font-label-bold text-outline">Join at:</span>
-                            <span class="font-bold text-white truncate max-w-[180px]" x-text="`${gameState.hostIP}:${gameState.hostPort}`"></span>
+                            <span class="font-bold text-white truncate max-w-[280px]" x-text="`${gameState.hostIP}:${gameState.hostPort}`"></span>
                         </div>
                         <div class="h-px bg-white/5 w-full"></div>
                         <div class="flex justify-between items-center text-xs">
