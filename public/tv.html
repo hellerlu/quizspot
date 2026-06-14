@@ -276,19 +276,19 @@
             <!-- Online & Local Hybrid Layout (Cloudflare Tunnel Active) -->
             <div x-show="gameState.publicUrl" class="grid grid-cols-12 gap-lg items-stretch mt-4">
                 <!-- Left: Local Arena -->
-                <div class="col-span-7 glass-panel p-lg rounded-3xl flex flex-col justify-between items-center text-center relative border-primary/20 neon-glow-primary">
+                <div class="col-span-6 glass-panel p-lg rounded-3xl flex flex-col justify-between items-center text-center relative border-primary/20 neon-glow-primary">
                     <div class="absolute -inset-1 bg-primary/5 blur-xl rounded-3xl pointer-events-none"></div>
                     <div class="space-y-xs z-10">
                         <span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-label-bold text-[10px] uppercase tracking-wider">Local Arena (Same Room)</span>
                         <h2 class="text-xl text-on-surface font-extrabold tracking-tight">Join via Local Network</h2>
                     </div>
 
-                    <!-- QRs container (Spaced out using gap-xl and larger sizing) -->
-                    <div class="flex gap-xl justify-center items-center my-md z-10">
+                    <!-- QRs container (Spaced out using gap-lg and optimized sizing) -->
+                    <div class="flex gap-lg justify-center items-center my-md z-10">
                         <!-- Wi-Fi QR (if configured) -->
                         <div x-show="gameState.wifi && gameState.wifi.ssid" class="flex flex-col items-center gap-xs">
                             <div class="bg-white p-4 rounded-2xl shadow-xl">
-                                <canvas id="wifi-qr-online" class="w-[140px] h-[140px] md:w-[160px] md:h-[160px]"></canvas>
+                                <canvas id="wifi-qr-online" class="w-[130px] h-[130px] md:w-[150px] md:h-[150px]"></canvas>
                             </div>
                             <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">1. Connect Wi-Fi</span>
                         </div>
@@ -296,7 +296,7 @@
                         <!-- Local Standard QR -->
                         <div class="flex flex-col items-center gap-xs">
                             <div class="bg-white p-4 rounded-2xl shadow-xl">
-                                <canvas id="lobby-qr-local" class="w-[140px] h-[140px] md:w-[160px] md:h-[160px]"></canvas>
+                                <canvas id="lobby-qr-local" class="w-[130px] h-[130px] md:w-[150px] md:h-[150px]"></canvas>
                             </div>
                             <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5" x-text="gameState.wifi && gameState.wifi.ssid ? '2. Scan to Join' : 'Scan to Join'"></span>
                         </div>
@@ -304,7 +304,7 @@
                         <!-- Local Chrome QR -->
                         <div class="flex flex-col items-center gap-xs">
                             <div class="bg-white p-4 rounded-2xl shadow-xl">
-                                <canvas id="lobby-qr-local-chrome" class="w-[140px] h-[140px] md:w-[160px] md:h-[160px]"></canvas>
+                                <canvas id="lobby-qr-local-chrome" class="w-[130px] h-[130px] md:w-[150px] md:h-[150px]"></canvas>
                             </div>
                             <span class="text-[9px] font-label-bold text-secondary-fixed uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">iOS (Chrome)</span>
                         </div>
@@ -329,25 +329,36 @@
                 </div>
 
                 <!-- Right: Web Arena -->
-                <div class="col-span-3 glass-panel p-lg rounded-3xl flex flex-col justify-between items-center text-center relative border-secondary-fixed/20 neon-glow-secondary">
+                <div class="col-span-4 glass-panel p-lg rounded-3xl flex flex-col justify-between items-center text-center relative border-secondary-fixed/20 neon-glow-secondary">
                     <div class="absolute -inset-1 bg-secondary-fixed/5 blur-xl rounded-3xl pointer-events-none"></div>
                     <div class="space-y-xs z-10">
                         <span class="px-3 py-1 rounded-full bg-secondary-fixed/10 text-secondary-fixed font-label-bold text-[10px] uppercase tracking-wider">Web Arena (Internet)</span>
                         <h2 class="text-xl text-on-surface font-extrabold tracking-tight">Join via Web</h2>
                     </div>
 
-                    <!-- Single Large QR Code container -->
-                    <div class="flex flex-col items-center gap-xs my-md z-10">
-                        <div class="bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
-                            <canvas id="lobby-qr-online" class="w-[180px] h-[180px] md:w-[200px] md:h-[200px]"></canvas>
+                    <!-- Double QR Codes container -->
+                    <div class="flex gap-lg justify-center items-center my-md z-10">
+                        <!-- Online Standard QR -->
+                        <div class="flex flex-col items-center gap-xs">
+                            <div class="bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
+                                <canvas id="lobby-qr-online" class="w-[130px] h-[130px] md:w-[150px] md:h-[150px]"></canvas>
+                            </div>
+                            <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">Scan to Join</span>
                         </div>
-                        <span class="text-[9px] font-label-bold text-outline-variant uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">Scan to Join</span>
+
+                        <!-- Online Chrome QR -->
+                        <div class="flex flex-col items-center gap-xs">
+                            <div class="bg-white p-4 rounded-2xl shadow-xl neon-glow-secondary">
+                                <canvas id="lobby-qr-online-chrome" class="w-[130px] h-[130px] md:w-[150px] md:h-[150px]"></canvas>
+                            </div>
+                            <span class="text-[9px] font-label-bold text-secondary-fixed uppercase tracking-wider bg-surface/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">iOS (Chrome)</span>
+                        </div>
                     </div>
 
                     <div class="glass-panel p-sm rounded-xl w-full text-left space-y-1 bg-surface-container-lowest/40 z-10">
                         <div class="flex justify-between items-center text-[11px]">
                             <span class="font-label-bold text-outline">Web URL:</span>
-                            <span class="font-bold text-primary truncate max-w-[160px]" x-text="gameState.publicUrl"></span>
+                            <span class="font-bold text-primary truncate max-w-[180px]" x-text="gameState.publicUrl"></span>
                         </div>
                         <div class="h-px bg-white/5 w-full"></div>
                         <div class="flex justify-between items-center text-[11px]">
@@ -989,6 +1000,19 @@
                                         background: 'white',
                                         foreground: '#10131b'
                                     });
+                                }
+                                // Online Chrome QR
+                                const onlineChromeEl = document.getElementById('lobby-qr-online-chrome');
+                                if (onlineChromeEl && onlineChromeJoinUrl) {
+                                    new QRious({
+                                        element: onlineChromeEl,
+                                        value: onlineChromeJoinUrl,
+                                        size: 600,
+                                        level: 'H',
+                                        background: 'white',
+                                        foreground: '#10131b'
+                                    });
+                                    drawChromeLogo(onlineChromeEl);
                                 }
 
 
