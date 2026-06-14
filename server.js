@@ -4,12 +4,16 @@ const socketIo = require('socket.io');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { spawn } = require('child_process');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
 const PORT = process.env.PORT || 3000;
+const isLocalOnly = process.argv.includes('--local-only') || process.env.LOCAL_ONLY === 'true';
+let cloudflaredProcess = null;
+
 const DATA_DIR = path.join(__dirname, 'data');
 let currentQuizFile = 'quiz.json';
 
@@ -260,6 +264,7 @@ let gameSession = {
     timerId: null,
     timeRemaining: 0,
     getReadyDuration: 4, // default transition time in seconds
+    publicUrl: null,
     wifi: {
         ssid: config.wifi ? (config.wifi.ssid || '') : '',
         password: config.wifi ? (config.wifi.password || '') : '',
@@ -313,6 +318,7 @@ function broadcastState() {
         timeRemaining: gameSession.timeRemaining,
         hostIP: getLocalIP(),
         hostPort: PORT,
+        publicUrl: gameSession.publicUrl,
         getReadyDuration: gameSession.getReadyDuration,
         wifi: gameSession.wifi
     };
@@ -654,11 +660,83 @@ io.on('connection', (socket) => {
     });
 });
 
+function startTunnel() {
+    if (isLocalOnly) {
+        console.log(` Running in Offline/Local-only mode.`);
+        return;
+    }
+
+    console.log(` Starting Cloudflare Tunnel...`);
+    cloudflaredProcess = spawn('cloudflared', ['tunnel', '--url', `http://localhost:${PORT}`]);
+
+    cloudflaredProcess.stderr.on('data', (data) => {
+        const line = data.toString();
+        // Cloudflare quick tunnel pattern: https://xxxx.trycloudflare.com
+        const match = line.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
+        if (match) {
+            gameSession.publicUrl = match[0];
+            console.log(`=========================================`);
+            console.log(` Cloudflare Tunnel Active!`);
+            console.log(` Web Join URL: ${gameSession.publicUrl}`);
+            console.log(`=========================================`);
+            broadcastState();
+        }
+    });
+
+    cloudflaredProcess.on('close', (code) => {
+        if (code !== 0 && cloudflaredProcess) {
+            console.log(` Cloudflare tunnel process exited with code ${code}`);
+        }
+        gameSession.publicUrl = null;
+        broadcastState();
+    });
+
+    cloudflaredProcess.on('error', (err) => {
+        console.error(` Failed to start cloudflared tunnel:`, err.message);
+        console.log(` Note: Ensure 'cloudflared' is installed on the system ("pkg install cloudflared" in Termux).`);
+        gameSession.publicUrl = null;
+        broadcastState();
+    });
+}
+
+function cleanupTunnel() {
+    if (cloudflaredProcess) {
+        console.log('Stopping Cloudflare tunnel...');
+        cloudflaredProcess.kill('SIGINT');
+        cloudflaredProcess = null;
+    }
+}
+
+// Exit handlers to clean up tunnel
+process.on('SIGINT', () => {
+    cleanupTunnel();
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    cleanupTunnel();
+    process.exit(0);
+});
+
+process.on('exit', () => {
+    cleanupTunnel();
+});
+
 server.listen(PORT, () => {
     console.log(`=========================================`);
-    console.log(` QuizSpot Server Running Offline!`);
+    if (isLocalOnly) {
+        console.log(` QuizSpot Server Running Offline!`);
+    } else {
+        console.log(` QuizSpot Server Running Online & Offline!`);
+    }
     console.log(` Host URL:   http://localhost:${PORT}/host.html`);
     console.log(` TV URL:     http://${getLocalIP()}:${PORT}/tv.html`);
     console.log(` Player URL: http://${getLocalIP()}:${PORT}/`);
+    if (!isLocalOnly) {
+        console.log(` Web URL:    Waiting for Cloudflare Tunnel...`);
+    }
     console.log(`=========================================`);
+    
+    startTunnel();
 });
+

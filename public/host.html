@@ -61,6 +61,16 @@
             <h1 class="font-display-mobile text-[24px] text-primary tracking-tighter italic font-extrabold uppercase leading-none">QuizSpot</h1>
         </div>
         <div class="flex items-center gap-md">
+            <!-- Web URL display for easy copying (if online) -->
+            <div class="hidden sm:flex flex-col items-end border-r border-white/10 pr-md mr-xs" x-show="gameState.publicUrl"
+                 @click="navigator.clipboard.writeText(gameState.publicUrl); alert('Public Web URL copied to clipboard!')"
+                 title="Click to copy Web URL">
+                <span class="font-label-bold text-[9px] text-outline uppercase tracking-wider flex items-center gap-xs cursor-pointer hover:text-white transition-colors">
+                    <span>WEB URL (COPY)</span>
+                    <span class="material-symbols-outlined text-[10px]">content_copy</span>
+                </span>
+                <span class="text-primary font-bold text-xs cursor-pointer hover:underline transition-colors truncate max-w-[150px]" x-text="gameState.publicUrl.replace('https://', '').replace('http://', '')"></span>
+            </div>
             <div class="flex flex-col items-end" x-show="gameState.pin">
                 <span class="font-label-bold text-[10px] text-outline uppercase tracking-wider">GAME PIN</span>
                 <span class="text-secondary-fixed font-bold tracking-widest text-lg" x-text="gameState.pin"></span>

@@ -16,6 +16,28 @@ MAGENTA='\033[0;35m'
 DIM='\033[2m'
 RED='\033[0;31m'
 
+# --- Parse arguments ---
+LOCAL_ONLY=false
+for arg in "$@"; do
+    case $arg in
+        --local-only|-l)
+        LOCAL_ONLY=true
+        shift
+        ;;
+    esac
+done
+
+if [ "$LOCAL_ONLY" = "false" ]; then
+    # Check if cloudflared is installed
+    if ! command -v cloudflared &>/dev/null; then
+        echo -e "${RED}${BOLD}✘ Error: 'cloudflared' is required for Online Mode but not found.${RESET}"
+        echo -e "${YELLOW}👉 Install it in Termux using:${RESET}  ${BOLD}pkg install cloudflared${RESET}"
+        echo -e "${YELLOW}👉 Or run locally using:${RESET}        ${BOLD}./start.sh --local-only${RESET}"
+        echo ""
+        exit 1
+    fi
+fi
+
 # --- Shutdown handler ---
 shutdown() {
     echo ""
@@ -110,8 +132,12 @@ echo ""
 echo -e "${YELLOW}▶  Starting QuizSpot server...${RESET}"
 echo ""
 
-# --- Step 5: Start the server, capturing output ---
-node server.js &
+# --- Step 5: Start the server, passing --local-only if set ---
+if [ "$LOCAL_ONLY" = "true" ]; then
+    node server.js --local-only &
+else
+    node server.js &
+fi
 SERVER_PID=$!
 
 # Poll until port is open (max 8 seconds)
@@ -135,6 +161,11 @@ if [ "$READY" -eq 1 ]; then
     echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
     echo -e "${GREEN}${BOLD}  ✔ Server is live! Open a link below to start:${RESET}"
     echo ""
+    if [ "$LOCAL_ONLY" = "true" ]; then
+        echo -e "  ${YELLOW}🌐 Mode   →${RESET}  ${BOLD}Offline / Local-only${RESET}"
+    else
+        echo -e "  ${YELLOW}🌐 Mode   →${RESET}  ${BOLD}Online (Cloudflare Tunnel active)${RESET}"
+    fi
     echo -e "  ${MAGENTA}🎮 Host   →${RESET}  ${BOLD}$HOST_URL${RESET}"
     echo -e "  ${CYAN}📺 TV     →${RESET}  ${BOLD}$TV_URL${RESET}"
     echo -e "  ${GREEN}👥 Player →${RESET}  ${BOLD}$PLAYER_URL${RESET}"
